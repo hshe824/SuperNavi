@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperNaviBeaconAPI", "SuperNaviBeaconAPI\SuperNaviBeaconAPI.csproj", "{28E59350-F428-4FD3-8D66-5AF58A1CFEF6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{0648A083-5586-4E83-A1CE-8C0F30802A05}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{C41AAAA0-FDA9-43C8-8013-C30F7C05B4FB}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1 = PublishScripts\Scripts\Deploy-AzureResourceGroup.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{A7387F3F-8BB7-4BFD-917C-7957727057B8}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Templates\SuperNaviBeaconAPI.json = PublishScripts\Templates\SuperNaviBeaconAPI.json
+		PublishScripts\Templates\SuperNaviBeaconAPI.param.dev.json = PublishScripts\Templates\SuperNaviBeaconAPI.param.dev.json
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{28E59350-F428-4FD3-8D66-5AF58A1CFEF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28E59350-F428-4FD3-8D66-5AF58A1CFEF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28E59350-F428-4FD3-8D66-5AF58A1CFEF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28E59350-F428-4FD3-8D66-5AF58A1CFEF6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C41AAAA0-FDA9-43C8-8013-C30F7C05B4FB} = {0648A083-5586-4E83-A1CE-8C0F30802A05}
+		{A7387F3F-8BB7-4BFD-917C-7957727057B8} = {0648A083-5586-4E83-A1CE-8C0F30802A05}
+	EndGlobalSection
+EndGlobal
