@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Azure;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using SuperNaviBeaconAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,10 +13,16 @@ namespace SuperNaviBeaconAPI.Controllers
 {
     public class BeaconController : ApiController
     {
+        private CloudTable beaconTable = CloudStorageAccount.Parse(
+            CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Beacon");
+        
         // GET: api/Beacon
-        public IEnumerable<string> Get()
+        [HttpGet]
+        public IEnumerable<Beacon> Get()
         {
-            return new string[] { "value1", "value2" };
+            beaconTable.CreateIfNotExists();
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"));
+            return beaconTable.ExecuteQuery(query).ToList();
         }
 
         // GET: api/Beacon/5
@@ -22,8 +32,18 @@ namespace SuperNaviBeaconAPI.Controllers
         }
 
         // POST: api/Beacon
-        public void Post([FromBody]string value)
+        public IHttpActionResult Post(DtoBeacon dtoBeacon)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Beacon beacon = dtoBeacon.toDomainObject();
+            TableOperation insertOperation = TableOperation.Insert(beacon);
+            beaconTable.Execute(insertOperation);
+
+            return CreatedAtRoute("DefaultApi", new { id = beacon.id }, beacon.ToDto());
         }
 
         // PUT: api/Beacon/5
