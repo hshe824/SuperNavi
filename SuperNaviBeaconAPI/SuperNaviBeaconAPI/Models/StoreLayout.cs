@@ -22,7 +22,14 @@ namespace superNaviBeaconAPI.Models
         public StoreLayoutNode[,] layout { get; set; }
 
         public void setupLayout() {
-            //LOGIC TO SET UP EACH NODE AND ITS RELATION GOES HERE
+            //Setting up Nodes
+            for (int x = 0; x < this.layout.GetLength(0); x++) {
+                for (int y = 0; y < this.layout.GetLength(1); y++) {
+                    this.layout[x, y] = new StoreLayoutNode(x, y);
+                }
+            }
+
+
 
 
         }
