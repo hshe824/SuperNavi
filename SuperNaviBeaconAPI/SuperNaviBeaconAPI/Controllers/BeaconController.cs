@@ -58,8 +58,11 @@ namespace SuperNaviBeaconAPI.Controllers
         }
 
         // DELETE: api/Beacon/5
-        public void Delete(int id)
+        public void Delete(String id)
         {
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"))
+                .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
+            TableOperation updateOperation = TableOperation.Delete(beaconTable.ExecuteQuery(query).First());
         }
     }
 }
