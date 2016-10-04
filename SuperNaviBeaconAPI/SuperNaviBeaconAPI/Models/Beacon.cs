@@ -26,7 +26,10 @@ namespace SuperNaviBeaconAPI.Models
             {
                 uuid = this.uuid,
                 positionX = this.positionX,
-                positionY = this.positionY
+                positionY = this.positionY,
+                majorid = this.majorid,
+                minorid = this.minorid,
+                rssi = this.rssi
             };
         }
     }
