@@ -24,7 +24,7 @@ namespace SuperNaviBeaconAPI.Models
         {
             return new DtoBeacon()
             {
-                id = this.id,
+                uuid = this.uuid,
                 positionX = this.positionX,
                 positionY = this.positionY
             };
