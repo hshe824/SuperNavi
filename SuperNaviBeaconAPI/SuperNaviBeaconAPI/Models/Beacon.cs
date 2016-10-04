@@ -8,9 +8,9 @@ namespace SuperNaviBeaconAPI.Models
 {
     public class Beacon : TableEntity 
     {
-        public Beacon(String id) {
+        public Beacon(String uuid) {
             this.PartitionKey = "Beacon";
-            this.RowKey = id;
+            this.RowKey = uuid;
         }
         public Beacon() { }
         public String uuid { get; set; }
