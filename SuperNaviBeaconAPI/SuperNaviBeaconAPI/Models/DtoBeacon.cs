@@ -7,8 +7,8 @@ namespace SuperNaviBeaconAPI.Models
 {
     public class DtoBeacon
     {
-        public DtoBeacon(String id) {
-            this.id = id;
+        public DtoBeacon(String uuid) {
+            this.uuid = uuid;
         }
         public DtoBeacon() { }
 
