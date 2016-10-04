@@ -21,7 +21,7 @@ namespace SuperNaviBeaconAPI.Models
 
         public Beacon toDomainObject()
         {
-            Beacon beacon = new Beacon(this.id)
+            Beacon beacon = new Beacon(this.uuid)
             {
                 positionX = this.positionX,
                 positionY = this.positionY,
