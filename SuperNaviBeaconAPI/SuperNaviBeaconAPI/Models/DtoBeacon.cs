@@ -25,6 +25,9 @@ namespace SuperNaviBeaconAPI.Models
             {
                 positionX = this.positionX,
                 positionY = this.positionY,
+                majorid = this.majorid,
+                minorid = this.minorid,
+                rssi = this.rssi
             };
 
             return beacon;
