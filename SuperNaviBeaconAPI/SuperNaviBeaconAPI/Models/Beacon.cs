@@ -13,7 +13,10 @@ namespace SuperNaviBeaconAPI.Models
             this.RowKey = id;
         }
         public Beacon() { }
-        public String id { get; set; }
+        public String uuid { get; set; }
+        public int majorid { get; set; }
+        public int minorid { get; set; }
+        public String rssi { get; set; }
         public int positionX { get; set; }
         public int positionY { get; set; }
 
