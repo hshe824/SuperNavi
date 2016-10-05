@@ -1,18 +1,17 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
 namespace SuperNaviBeaconAPI.Models
 {
-    public class Beacon : TableEntity 
+    public class DtoBeacon
     {
-        public Beacon(String uuid) {
-            this.PartitionKey = "Beacon";
-            this.RowKey = uuid;
+        public DtoBeacon(String uuid) {
+            this.uuid = uuid;
         }
-        public Beacon() { }
+        public DtoBeacon() { }
+
         public String uuid { get; set; }
         public int majorid { get; set; }
         public int minorid { get; set; }
@@ -20,17 +19,18 @@ namespace SuperNaviBeaconAPI.Models
         public int positionX { get; set; }
         public int positionY { get; set; }
 
-        public DtoBeacon ToDto()
+        public Beacon toDomainObject()
         {
-            return new DtoBeacon()
+            Beacon beacon = new Beacon(this.uuid)
             {
-                uuid = this.uuid,
                 positionX = this.positionX,
                 positionY = this.positionY,
                 majorid = this.majorid,
                 minorid = this.minorid,
                 rssi = this.rssi
             };
+
+            return beacon;
         }
     }
 }
