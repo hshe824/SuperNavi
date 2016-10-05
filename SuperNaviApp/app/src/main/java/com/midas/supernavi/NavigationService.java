@@ -13,6 +13,17 @@ import java.util.ArrayList;
 
 
 public class NavigationService extends Service implements BeaconConsumer  {
+
+    private OperatingMode currentOperatingMode;
+
+    enum OperatingMode {
+        PRODUCT_SELECTION,
+        FREE_ROAM,
+        NAVIGATION
+    }
+
+
+
     public NavigationService() {
     }
 
