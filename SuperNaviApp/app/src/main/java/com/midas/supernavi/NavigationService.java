@@ -1,20 +1,31 @@
 package com.midas.supernavi;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Region;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.RemoteException;
+import android.os.Vibrator;
 import android.util.Log;
 
 import org.altbeacon.beacon.BeaconConsumer;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 
 public class NavigationService extends Service implements BeaconConsumer  {
-
+    //State fields
     private OperatingMode currentOperatingMode;
+    private Context context;
+
+
+    //Service objects
+    private PowerManager.WakeLock wakeLock;
+    private Vibrator vibrator;
 
     enum OperatingMode {
         PRODUCT_SELECTION,
@@ -22,10 +33,30 @@ public class NavigationService extends Service implements BeaconConsumer  {
         NAVIGATION
     }
 
+    //Free roam:
+    // You are in aisle x, this has a,b, c
+    // You are passing bananas
+    
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        PowerManager powerManager = (PowerManager) getSystemService(this.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DoNotSleep");
+        context = this.getApplicationContext();
+        Log.i("Navigation Service", "        Service Created");
+
+    }
+    private void vibrate(){
+        vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        //Vibrate for 500ms
+        vibrator.vibrate(500);
+    }
 
 
     public NavigationService() {
     }
+
 
     @Override
     public IBinder onBind(Intent intent) {
