@@ -28,10 +28,6 @@ namespace superNaviBeaconAPI.Models
                     this.layout[x, y] = new StoreLayoutNode(x, y);
                 }
             }
-
-
-
-
         }
     }
 }

@@ -261,6 +261,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\BeaconController.cs" />
+    <Compile Include="Models\GroceryItem.cs" />
     <Compile Include="Models\StoreLayout.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NavigationController.cs" />
