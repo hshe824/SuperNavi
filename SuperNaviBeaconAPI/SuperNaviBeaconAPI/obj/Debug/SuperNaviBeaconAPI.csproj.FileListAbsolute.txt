@@ -280,3 +280,6 @@ H:\Documents\HCI\SuperNavi\SuperNaviBeaconAPI\SuperNaviBeaconAPI\bin\ko\System.S
 H:\Documents\HCI\SuperNavi\SuperNaviBeaconAPI\SuperNaviBeaconAPI\bin\ru\System.Spatial.resources.dll
 H:\Documents\HCI\SuperNavi\SuperNaviBeaconAPI\SuperNaviBeaconAPI\bin\zh-Hans\System.Spatial.resources.dll
 H:\Documents\HCI\SuperNavi\SuperNaviBeaconAPI\SuperNaviBeaconAPI\bin\zh-Hant\System.Spatial.resources.dll
+C:\Users\Jay\Documents\SuperNavi\SuperNaviBeaconAPI\SuperNaviBeaconAPI\obj\Debug\SuperNaviBeaconAPI.csprojResolveAssemblyReference.cache
+C:\Users\Jay\Documents\SuperNavi\SuperNaviBeaconAPI\SuperNaviBeaconAPI\obj\Debug\SuperNaviBeaconAPI.dll
+C:\Users\Jay\Documents\SuperNavi\SuperNaviBeaconAPI\SuperNaviBeaconAPI\obj\Debug\SuperNaviBeaconAPI.pdb
