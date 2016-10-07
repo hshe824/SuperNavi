@@ -7,8 +7,10 @@ namespace SuperNaviBeaconAPI.Models
 {
     public class DtoBeacon
     {
-        public DtoBeacon(String uuid) {
+        public DtoBeacon(String uuid, int majorid, int minorid) {
             this.uuid = uuid;
+            this.majorid = majorid;
+            this.minorid = minorid;
         }
         public DtoBeacon() { }
 
@@ -16,18 +18,18 @@ namespace SuperNaviBeaconAPI.Models
         public int majorid { get; set; }
         public int minorid { get; set; }
         public String rssi { get; set; }
+        public String superMarket { get; set; }
         public int positionX { get; set; }
         public int positionY { get; set; }
 
         public Beacon toDomainObject()
         {
-            Beacon beacon = new Beacon(this.uuid)
+            Beacon beacon = new Beacon(this.uuid, this.majorid, this.minorid)
             {
                 positionX = this.positionX,
                 positionY = this.positionY,
-                majorid = this.majorid,
-                minorid = this.minorid,
-                rssi = this.rssi
+                rssi = this.rssi,
+                superMarket = this.superMarket
             };
 
             return beacon;

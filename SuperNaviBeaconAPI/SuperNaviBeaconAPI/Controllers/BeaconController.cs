@@ -25,10 +25,10 @@ namespace SuperNaviBeaconAPI.Controllers
         }
 
         // GET: api/Beacon/5
-        public IEnumerable<Beacon> Get(String uuid)
+        public IEnumerable<Beacon> Get(String id)
         {
             TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"))
-                .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, uuid));
+                .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
             return beaconTable.ExecuteQuery(query).ToList();
         }
 
