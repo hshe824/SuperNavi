@@ -20,15 +20,16 @@ namespace SuperNaviBeaconAPI.Controllers
         [HttpGet]
         public IEnumerable<Beacon> Get()
         {
-            beaconTable.CreateIfNotExists();
             TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"));
             return beaconTable.ExecuteQuery(query).ToList();
         }
 
         // GET: api/Beacon/5
-        public string Get(int id)
+        public IEnumerable<Beacon> Get(String id)
         {
-            return "value";
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"))
+                .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
+            return beaconTable.ExecuteQuery(query).ToList();
         }
 
         // POST: api/Beacon
@@ -43,17 +44,25 @@ namespace SuperNaviBeaconAPI.Controllers
             TableOperation insertOperation = TableOperation.Insert(beacon);
             beaconTable.Execute(insertOperation);
 
-            return CreatedAtRoute("DefaultApi", new { id = beacon.id }, beacon.ToDto());
+            return CreatedAtRoute("DefaultApi", new { uuid = beacon.uuid }, beacon.ToDto());
         }
 
         // PUT: api/Beacon/5
-        public void Put(int id, [FromBody]string value)
+        public IHttpActionResult Put(String uuid, DtoBeacon dtoBeacon)
         {
+            Beacon beacon = dtoBeacon.toDomainObject();
+            TableOperation updateOperation = TableOperation.InsertOrReplace(beacon);
+            beaconTable.Execute(updateOperation);
+
+            return CreatedAtRoute("DefaultApi", new { uuid = beacon.uuid }, beacon.ToDto());
         }
 
         // DELETE: api/Beacon/5
-        public void Delete(int id)
+        public void Delete(String uuid)
         {
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"))
+                .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, uuid));
+            TableOperation updateOperation = TableOperation.Delete(beaconTable.ExecuteQuery(query).First());
         }
     }
 }

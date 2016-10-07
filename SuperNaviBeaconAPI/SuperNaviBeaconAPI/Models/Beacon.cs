@@ -8,12 +8,16 @@ namespace SuperNaviBeaconAPI.Models
 {
     public class Beacon : TableEntity 
     {
-        public Beacon(String id) {
+        public Beacon(String uuid, int majorid, int minorid) {
             this.PartitionKey = "Beacon";
-            this.RowKey = id;
+            this.RowKey = uuid+majorid+minorid;
         }
         public Beacon() { }
-        public String id { get; set; }
+        public String uuid { get; set; }
+        public int majorid { get; set; }
+        public int minorid { get; set; }
+        public String rssi { get; set; }
+        public String superMarket { get; set; }
         public int positionX { get; set; }
         public int positionY { get; set; }
 
@@ -21,9 +25,13 @@ namespace SuperNaviBeaconAPI.Models
         {
             return new DtoBeacon()
             {
-                id = this.id,
+                uuid = this.uuid,
                 positionX = this.positionX,
-                positionY = this.positionY
+                positionY = this.positionY,
+                majorid = this.majorid,
+                minorid = this.minorid,
+                rssi = this.rssi,
+                superMarket = this.superMarket
             };
         }
     }
