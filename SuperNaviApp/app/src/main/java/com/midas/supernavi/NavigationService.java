@@ -3,9 +3,9 @@ package com.midas.supernavi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.RemoteException;
 import android.os.Vibrator;
 import android.util.Log;
 
@@ -15,10 +15,8 @@ import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 
 
 public class NavigationService extends Service implements BeaconConsumer  {
