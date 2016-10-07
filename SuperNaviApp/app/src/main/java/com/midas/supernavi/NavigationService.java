@@ -3,17 +3,32 @@ package com.midas.supernavi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.Vibrator;
 import android.util.Log;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
 
-public class NavigationService extends Service /*implements BeaconConsumer*/  {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
+
+
+public class NavigationService extends Service implements BeaconConsumer  {
+
+    private static final String TAG = "NavigationService";
+
     //State fields
     private OperatingMode currentOperatingMode;
     private Context context;
-
+    private BeaconManager beaconManager;
 
     //Service objects
     private PowerManager.WakeLock wakeLock;
@@ -57,27 +72,27 @@ public class NavigationService extends Service /*implements BeaconConsumer*/  {
     }
 
 
- //   @Override
-//    public void onBeaconServiceConnect() {
-//        beaconManager.addRangeNotifier(new RangeNotifier() {
-//            @Override
-//            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-//                Iterator<Beacon> iterator = collection.iterator();
-//                while(iterator.hasNext()){
-//                    Beacon beacon = iterator.next();
-//                    Log.d(TAG, "Beacon ID1: " + beacon.getId1());
-//                    Log.d(TAG, "Beacon ID2: " + beacon.getId2());
-//                    Log.d(TAG, "Beacon ID3: " + beacon.getId3());
-//                    Log.d(TAG, "Beacon ID3: " + beacon.getRssi());
-//                }
-//                currentBeaconList = new ArrayList<>(collection);
-//            }
-//        });
-//
-//        try{
-//            beaconManager.startRangingBeaconsInRegion(new Region("defaultRegion", null, null, null));
-//        }catch(RemoteException e){
-//
-//        }
-//    }
+    @Override
+    public void onBeaconServiceConnect() {
+
+        beaconManager.addRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
+                Iterator<Beacon> iterator = collection.iterator();
+                while(iterator.hasNext()){
+                    Beacon beacon = iterator.next();
+                    Log.d(TAG, "Beacon ID1: " + beacon.getId1());
+                    Log.d(TAG, "Beacon ID2: " + beacon.getId2());
+                    Log.d(TAG, "Beacon ID3: " + beacon.getId3());
+                    Log.d(TAG, "Beacon ID3: " + beacon.getRssi());
+                }
+            }
+        });
+
+        try{
+            beaconManager.startRangingBeaconsInRegion(new Region("defaultRegion", null, null, null));
+        }catch(RemoteException e){
+
+        }
+    }
 }
