@@ -26,7 +26,7 @@ namespace SuperNaviBeaconAPI.Models
         public int majorid { get; set; }
         [Required]
         public int minorid { get; set; }
-        public String rssi { get; set; }
+        public int rssi { get; set; }
         public String superMarket { get; set; }
         [Required]
         public int positionX { get; set; }

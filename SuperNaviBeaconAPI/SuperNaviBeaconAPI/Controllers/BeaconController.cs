@@ -45,7 +45,33 @@ namespace SuperNaviBeaconAPI.Controllers
             }
 
             Beacon beacon = dtoBeacon.toDomainObject();
-            TableOperation insertOperation = TableOperation.Insert(beacon);
+
+            //See if the beacon exists
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, beacon.PartitionKey))
+                .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, beacon.RowKey));
+
+            Beacon beaconRetrieved = beaconTable.ExecuteQuery(query).First();
+            
+            //If there was no beacon data for this position for this specific beacon, insert new
+            if(beaconRetrieved == null)
+            {
+                beaconRetrieved = beacon;
+            }
+            //If there was
+            else
+            {
+                //Get the averaged RSSI
+                var rssi = beaconRetrieved.rssi;
+                var totalrssi = rssi * beaconRetrieved.count;
+
+                //Calculate the new average with the data that has just been recieved
+                beaconRetrieved.rssi = (rssi + beacon.rssi) / (beaconRetrieved.count + 1);
+                beaconRetrieved.count = beaconRetrieved.count + 1;
+            }
+            
+            //Insert and update
+            TableOperation insertOperation = TableOperation.InsertOrReplace(beaconRetrieved);
+            
             beaconTable.Execute(insertOperation);
 
             return CreatedAtRoute("DefaultApi", new { id = beacon.uuid + beacon.majorid + beacon.minorid + beacon.positionX + beacon.positionY }, beacon.ToDto());
