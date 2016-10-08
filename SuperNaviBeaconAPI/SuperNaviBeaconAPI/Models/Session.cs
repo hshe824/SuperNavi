@@ -8,13 +8,8 @@ namespace SuperNaviBeaconAPI.Models
 {
     public class Session
     {
-        Supermarket supermarket;
-        Beacon lastBeacon;
-
-        public Session(List<Beacon> beacons)
-        {
-
-        }
+        public Supermarket supermarket { get; set; }
+        private Beacon lastBeacon;
 
         internal void updateNewPosition(List<DtoBeacon> beacons)
         {

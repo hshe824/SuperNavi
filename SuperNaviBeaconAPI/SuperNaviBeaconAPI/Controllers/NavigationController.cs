@@ -31,21 +31,52 @@ namespace SuperNaviBeaconAPI.Controllers
             return "value";
         }
 
+        //Post api/Navigation
+        public String Post(DtoBeacon beacon)
+        {
+            //Get the name of the supermarket with one of the beacons
+            TableQuery<Beacon> query = new TableQuery<Beacon>();
+            foreach(Beacon entity in beaconTable.ExecuteQuery(query))
+            {
+                if(entity.majorid == beacon.majorid &&
+                   entity.minorid == beacon.minorid &&
+                   entity.uuid == beacon.uuid)
+                {
+                    return entity.superMarket;
+                }
+            }
+
+            return "Supermarket not found";
+        }
+
+        //POST api.Navigation
+        public HttpStatusCode Post(List<DtoItem> items, String supermarketName)
+        {
+            String ipAddress = Request.GetOwinContext().Request.RemoteIpAddress;
+
+
+
+            Supermarket supermarket = new Supermarket()
+            {
+                name = supermarketName,
+            };
+
+            Session session = new Session()
+            {
+                supermarket = supermarket,
+            };
+
+            connections[ipAddress] = session;
+
+            return HttpStatusCode.OK;
+        }
+
         // POST api/Navigation
         public String Post(List<DtoBeacon> beacons)
         {
             String ipAddress = Request.GetOwinContext().Request.RemoteIpAddress;
-            Session session;
-            if (connections.ContainsKey(ipAddress))
-            {
-                session = connections[ipAddress];
-            }
-            else
-            {
-                session = new Session();
-                connections[ipAddress] = session;
-            }
-
+            Session session = connections[ipAddress];
+            
             session.updateNewPosition(beacons);
             return session.getDirection();
         }
