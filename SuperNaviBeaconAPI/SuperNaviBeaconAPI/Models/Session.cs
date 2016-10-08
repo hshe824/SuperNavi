@@ -11,10 +11,12 @@ namespace SuperNaviBeaconAPI.Models
         public Supermarket supermarket { get; set; }
         //Maintains a list of the points travelled
         private List<Point> travelPath = new List<Point>();
-
+        
         /**
             Update the current position given the new beacon data
         */
+        public Session(){}
+
         internal void UpdateNewPosition(List<DtoBeacon> beacons)
         {
             Point minimumDifferencePoint = new Point()
