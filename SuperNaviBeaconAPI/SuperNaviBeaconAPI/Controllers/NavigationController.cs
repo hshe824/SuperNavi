@@ -19,6 +19,8 @@ namespace SuperNaviBeaconAPI.Controllers
         private CloudTable beaconTable = CloudStorageAccount.Parse(
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Beacon");
 
+
+
         // GET api/Navigation
         public IEnumerable<string> Get()
         {
@@ -45,7 +47,6 @@ namespace SuperNaviBeaconAPI.Controllers
                     return entity.superMarket;
                 }
             }
-
             return "Supermarket not found";
         }
 
