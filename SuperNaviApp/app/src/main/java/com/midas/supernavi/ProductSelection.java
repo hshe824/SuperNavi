@@ -17,7 +17,7 @@ public class ProductSelection extends AppCompatActivity {
         setContentView(R.layout.activity_product_selection);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-       // populateListView();
+        populateListView();
 
     }
 

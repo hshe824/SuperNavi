@@ -20,7 +20,7 @@
         android:layout_alignParentBottom="true">
         <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
             android:id="@+id/mySeekBar"
-            android:max="3"
+            android:max="2"
             android:layout_width="62dp"
             android:layout_height="0dp"
             android:splitTrack="false"
@@ -32,7 +32,6 @@
         android:layout_height="match_parent"
         android:id="@+id/groceryList"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/verticalSeekBarWrapper"
         android:layout_marginStart="26dp" />
 
 </RelativeLayout>
