@@ -11,7 +11,7 @@ namespace SuperNaviBeaconAPI.Models
     {
         public Beacon(String superMarket, String uuid, int majorid, int minorid, int positionX, int positionY) {
             this.PartitionKey = superMarket;
-            this.RowKey = uuid+majorid+minorid+positionX+positionY;
+            this.RowKey = uuid + "*" + majorid + "*" + minorid + "*" + positionX + "*" + positionY;
             this.superMarket = superMarket;
             this.uuid = uuid;
             this.majorid = majorid;

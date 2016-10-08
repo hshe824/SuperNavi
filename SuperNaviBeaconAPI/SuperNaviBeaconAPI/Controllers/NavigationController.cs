@@ -53,19 +53,20 @@ namespace SuperNaviBeaconAPI.Controllers
         public HttpStatusCode Post(List<DtoItem> items, String supermarketName)
         {
             String ipAddress = Request.GetOwinContext().Request.RemoteIpAddress;
-
-
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarketName));
+            List<Beacon> allBeaconData = beaconTable.ExecuteQuery(query).ToList();
 
             Supermarket supermarket = new Supermarket()
             {
                 name = supermarketName,
+                allBeaconData = allBeaconData,
             };
 
             Session session = new Session()
             {
                 supermarket = supermarket,
             };
-
+            
             connections[ipAddress] = session;
 
             return HttpStatusCode.OK;
@@ -77,8 +78,8 @@ namespace SuperNaviBeaconAPI.Controllers
             String ipAddress = Request.GetOwinContext().Request.RemoteIpAddress;
             Session session = connections[ipAddress];
             
-            session.updateNewPosition(beacons);
-            return session.getDirection();
+            session.UpdateNewPosition(beacons);
+            return session.GetDirection();
         }
 
         // PUT api/Navigation/5
