@@ -54,7 +54,7 @@ public class ProductSelection extends AppCompatActivity {
 
     }
 
-    //Handles navigate mode
+    //Handles product selection mode
     private void productSelection() {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
         Log.d("Mode","Entering product selection mode");
@@ -75,7 +75,7 @@ public class ProductSelection extends AppCompatActivity {
     }
 
 
-    //Handles navigate mode
+    //Handles free roam mode
     private void freeRoam() {
         currentOperatingMode = OperatingMode.FREE_ROAM;
         Log.d("Mode","Entering free roam mode");
@@ -84,7 +84,7 @@ public class ProductSelection extends AppCompatActivity {
 
 
     }
-
+    // Show google speech recognizer
     private void displaySpeechRecognizer() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -101,12 +101,15 @@ public class ProductSelection extends AppCompatActivity {
         if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             Log.d("Matches:",matches.toString());
+            //Global commands to change mode etc
             if (matches.contains("product selection") ||matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
                 modeSelector.setProgress(0);
             } else if (matches.contains("navigate") || matches.contains("navigation")) {
                 modeSelector.setProgress(1);
             } else if (matches.contains("free roam") || matches.contains("free") || matches.contains("roam")) {
                 modeSelector.setProgress(2);
+            } else if (matches.contains("where") || matches.contains("am") || matches.contains("i")){
+                //TODO: Tell user where they are
             }
 
         }
