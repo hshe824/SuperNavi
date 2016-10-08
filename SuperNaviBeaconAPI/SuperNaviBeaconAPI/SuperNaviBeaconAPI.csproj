@@ -261,7 +261,9 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\BeaconController.cs" />
-    <Compile Include="Models\Items.cs" />
+    <Compile Include="Controllers\ItemController.cs" />
+    <Compile Include="Models\DtoItem.cs" />
+    <Compile Include="Models\Item.cs" />
     <Compile Include="Models\Point.cs" />
     <Compile Include="Models\Session.cs" />
     <Compile Include="Models\StoreLayout.cs" />

@@ -43,7 +43,7 @@ namespace SuperNaviBeaconAPI.Controllers
                    entity.minorid == beacon.minorid &&
                    entity.uuid == beacon.uuid)
                 {
-                    return entity.superMarket;
+                    return entity.supermarket;
                 }
             }
             return "Supermarket not found";
