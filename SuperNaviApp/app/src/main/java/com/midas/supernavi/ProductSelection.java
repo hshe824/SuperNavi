@@ -7,9 +7,41 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SeekBar;
+
+import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 
 public class ProductSelection extends AppCompatActivity {
 
+    private VerticalSeekBar modeSelector;
+    private OperatingMode currentOperatingMode;
+
+
+    enum OperatingMode {
+        PRODUCT_SELECTION,
+        NAVIGATION,
+        FREE_ROAM
+    }
+
+    class modeListener implements SeekBar.OnSeekBarChangeListener {
+
+        public void onProgressChanged(SeekBar seekBar, int progress,
+                                      boolean fromUser) {
+            switch (progress){
+                case 0:
+                    currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
+                case 1:
+                    currentOperatingMode = OperatingMode.NAVIGATION;
+                case 2:
+                    currentOperatingMode = OperatingMode.FREE_ROAM;
+            }
+        }
+
+        public void onStartTrackingTouch(SeekBar seekBar) {}
+
+        public void onStopTrackingTouch(SeekBar seekBar) {}
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,19 +50,23 @@ public class ProductSelection extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         populateListView();
+        //Default mode is product selection
+        this.setTitle("SuperNavi - Product Selection");
+        currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
+        modeSelector = (VerticalSeekBar) findViewById(R.id.modeSelector);
+        modeSelector.setOnSeekBarChangeListener(new modeListener());
 
     }
 
+    //Creates grocery list
     private void populateListView(){
         String[] groceries = {"Bananas","Milk","Steak","Lettuce","Chips","Bread"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.groceries, groceries);
-
         ListView list = (ListView) findViewById(R.id.groceryList);
-
         list.setAdapter(adapter);
-
-
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -24,7 +24,6 @@ public class NavigationService extends Service implements BeaconConsumer  {
     private static final String TAG = "NavigationService";
 
     //State fields
-    private OperatingMode currentOperatingMode;
     private Context context;
     private BeaconManager beaconManager;
 
@@ -32,11 +31,6 @@ public class NavigationService extends Service implements BeaconConsumer  {
     private PowerManager.WakeLock wakeLock;
     private Vibrator vibrator;
 
-    enum OperatingMode {
-        PRODUCT_SELECTION,
-        FREE_ROAM,
-        NAVIGATION
-    }
 
     //Free roam:
     // You are in aisle x, this has a,b, c
