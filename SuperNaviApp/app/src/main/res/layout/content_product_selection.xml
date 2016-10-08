@@ -13,7 +13,7 @@
 
 
     <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="150dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
@@ -23,6 +23,10 @@
             android:max="2"
             android:layout_width="62dp"
             android:layout_height="0dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="20dp"
             android:splitTrack="false"
             app:seekBarRotation="CW90" /> <!-- Rotation: CW90 or CW270 -->
     </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
@@ -31,7 +35,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/groceryList"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="26dp" />
+        android:layout_marginStart="80dp" />
 
 </RelativeLayout>
