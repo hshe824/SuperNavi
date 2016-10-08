@@ -5,8 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class ProductSelection extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,6 +17,18 @@ public class ProductSelection extends AppCompatActivity {
         setContentView(R.layout.activity_product_selection);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+       // populateListView();
+
+    }
+
+    private void populateListView(){
+        String[] groceries = {"Bananas","Milk","Steak","Lettuce","Chips","Bread"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.groceries, groceries);
+
+        ListView list = (ListView) findViewById(R.id.groceryList);
+
+        list.setAdapter(adapter);
+
 
     }
 

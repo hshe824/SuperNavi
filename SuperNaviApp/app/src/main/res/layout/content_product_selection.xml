@@ -20,10 +20,19 @@
         android:layout_alignParentBottom="true">
         <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
             android:id="@+id/mySeekBar"
-            android:layout_width="0dp"
+            android:max="3"
+            android:layout_width="62dp"
             android:layout_height="0dp"
             android:splitTrack="false"
             app:seekBarRotation="CW90" /> <!-- Rotation: CW90 or CW270 -->
     </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/groceryList"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/verticalSeekBarWrapper"
+        android:layout_marginStart="26dp" />
 
 </RelativeLayout>
