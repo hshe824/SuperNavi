@@ -264,6 +264,7 @@
     <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Models\DtoItem.cs" />
     <Compile Include="Models\Item.cs" />
+    <Compile Include="Models\Point.cs" />
     <Compile Include="Models\Session.cs" />
     <Compile Include="Models\StoreLayout.cs" />
     <Compile Include="Controllers\HomeController.cs" />
