@@ -9,10 +9,10 @@ namespace SuperNaviBeaconAPI.Models
 {
     public class Beacon : TableEntity 
     {
-        public Beacon(String superMarket, String uuid, int majorid, int minorid, int positionX, int positionY) {
-            this.PartitionKey = superMarket;
-            this.RowKey = uuid + "*" + majorid + "*" + minorid + "*" + positionX + "*" + positionY;
-            this.superMarket = superMarket;
+        public Beacon(String supermarket, String uuid, int majorid, int minorid, int positionX, int positionY) {
+            this.PartitionKey = supermarket;
+            this.RowKey = uuid+majorid+minorid+positionX+positionY;
+            this.supermarket = supermarket;
             this.uuid = uuid;
             this.majorid = majorid;
             this.minorid = minorid;
@@ -27,7 +27,7 @@ namespace SuperNaviBeaconAPI.Models
         [Required]
         public int minorid { get; set; }
         public int rssi { get; set; }
-        public String superMarket { get; set; }
+        public String supermarket { get; set; }
         [Required]
         public int positionX { get; set; }
         [Required]
@@ -44,7 +44,7 @@ namespace SuperNaviBeaconAPI.Models
                 majorid = this.majorid,
                 minorid = this.minorid,
                 rssi = this.rssi,
-                superMarket = this.superMarket,
+                supermarket = this.supermarket,
                 count = this.count
             };
         }

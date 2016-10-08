@@ -17,20 +17,20 @@ namespace SuperNaviBeaconAPI.Controllers
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Beacon");
         
         // GET: api/Beacon
-        [Route("~/api/beacon/{superMarket}")]
+        [Route("~/api/beacon/{supermarket}")]
         [HttpGet]
-        public IEnumerable<Beacon> Get(String superMarket)
+        public IEnumerable<Beacon> Get(String supermarket)
         {
-            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, superMarket));
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket));
             return beaconTable.ExecuteQuery(query).ToList();
         }
 
         // GET: api/Beacon/5
-        [Route("~/api/beacon/{superMarket}/{id}")]
+        [Route("~/api/beacon/{supermarket}/{id}")]
         [HttpGet]
-        public IEnumerable<Beacon> Get(String superMarket, String id)
+        public IEnumerable<Beacon> Get(String supermarket, String id)
         {
-            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, superMarket))
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket))
                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
             return beaconTable.ExecuteQuery(query).ToList();
         }
@@ -78,11 +78,11 @@ namespace SuperNaviBeaconAPI.Controllers
         }
 
         // PUT: api/Beacon/5
-        [Route("~/api/beacon/{superMarket}/{id}")]
+        [Route("~/api/beacon/{supermarket}/{id}")]
         [HttpPut]
-        public IHttpActionResult Put(String superMarket, String id, DtoBeacon dtoBeacon)
+        public IHttpActionResult Put(String supermarket, String id, DtoBeacon dtoBeacon)
         {
-            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, superMarket))
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket))
                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
             TableOperation deleteOperation = TableOperation.Delete(beaconTable.ExecuteQuery(query).First());
             beaconTable.Execute(deleteOperation);
@@ -93,11 +93,11 @@ namespace SuperNaviBeaconAPI.Controllers
         }
 
         // DELETE: api/Beacon/5
-        [Route("~/api/beacon/{superMarket}/{id}")]
+        [Route("~/api/beacon/{supermarket}/{id}")]
         [HttpDelete]
-        public void Delete(String superMarket, String id)
+        public void Delete(String supermarket, String id)
         {
-            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, superMarket))
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket))
                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
             TableOperation deleteOperation = TableOperation.Delete(beaconTable.ExecuteQuery(query).First());
             beaconTable.Execute(deleteOperation);
