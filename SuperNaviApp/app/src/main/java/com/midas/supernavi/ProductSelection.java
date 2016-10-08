@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
 
@@ -79,6 +82,7 @@ public class ProductSelection extends AppCompatActivity {
                     RecognizerIntent.EXTRA_RESULTS);
             String spokenText = results.get(0);
             // Do something with spokenText
+            Log.v("test",spokenText);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -96,6 +100,12 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
         modeSelector = (VerticalSeekBar) findViewById(R.id.modeSelector);
         modeSelector.setOnSeekBarChangeListener(new modeListener());
+        Button speakCommand = (Button) findViewById(R.id.speakCommand);
+        speakCommand.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                displaySpeechRecognizer();
+            }
+        });
 
     }
 
