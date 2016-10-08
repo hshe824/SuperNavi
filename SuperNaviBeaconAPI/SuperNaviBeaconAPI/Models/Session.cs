@@ -11,6 +11,8 @@ namespace SuperNaviBeaconAPI.Models
         Supermarket supermarket;
         Beacon lastBeacon;
 
+        public Session(){}
+
         public Session(List<Beacon> beacons)
         {
 
