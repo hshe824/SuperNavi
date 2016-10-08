@@ -22,11 +22,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import static com.midas.supernavi.R.id.groceryList;
+
 public class ProductSelection extends AppCompatActivity {
 
     private VerticalSeekBar modeSelector;
     private OperatingMode currentOperatingMode;
     private TextToSpeech textToSpeech;
+    private List<String> gList;
+    private ArrayAdapter<String> adapter;
 
     private static final int SPEECH_REQUEST_CODE = 0;
 
@@ -79,7 +83,7 @@ public class ProductSelection extends AppCompatActivity {
     private void navigate() {
         currentOperatingMode = OperatingMode.NAVIGATION;
         Log.d("Mode","Entering navigation mode");
-        setTitle("SuperNavi - Navigate");
+        setTitle("SuperNavi - Navigation");
         textToSpeech.speak("Entering navigation mode",TextToSpeech.QUEUE_FLUSH, null,null);
 
 
@@ -90,7 +94,7 @@ public class ProductSelection extends AppCompatActivity {
     private void freeRoam() {
         currentOperatingMode = OperatingMode.FREE_ROAM;
         Log.d("Mode","Entering free roam mode");
-        setTitle("SuperNavi - FreeRoam");
+        setTitle("SuperNavi - Free Roam");
         textToSpeech.speak("Entering free roam mode",TextToSpeech.QUEUE_FLUSH, null,null);
 
 
@@ -109,13 +113,12 @@ public class ProductSelection extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             Log.d("Matches:",matches.toString());
             //Global commands to change mode etc
             if (!checkCommand(matches)){
-                //
+
             }
 
 
@@ -123,23 +126,55 @@ public class ProductSelection extends AppCompatActivity {
     }
 
     private boolean checkCommand(ArrayList<String> matches){
-        if (matches.contains("product selection") ||matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
+        //Global commands
+        if (matches.contains("product selection mode") || matches.contains("product selection") ||matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
             modeSelector.setProgress(0);
+            if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION){
+                textToSpeech.speak("You are already in product selection mode!",TextToSpeech.QUEUE_FLUSH, null,null);
+            }
             return true;
-        } else if (matches.contains("navigate") || matches.contains("navigation")) {
+        } else if (matches.contains("navigate") || matches.contains("navigation") || matches.contains("navigation mode")) {
             modeSelector.setProgress(1);
+            if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION){
+                textToSpeech.speak("You are already in navigation mode!",TextToSpeech.QUEUE_FLUSH, null,null);
+            }
             return true;
-        } else if (matches.contains("free roam") || matches.contains("free") || matches.contains("roam")) {
+        } else if (matches.contains("free roam mode") || matches.contains("free roam") || matches.contains("roam")) {
             modeSelector.setProgress(2);
+            if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION){
+                textToSpeech.speak("You are already in free roam mode!",TextToSpeech.QUEUE_FLUSH, null,null);
+            }
             return true;
-        } else if (matches.contains("where") || matches.contains("am") || matches.contains("i")){
+        } else if (matches.contains("where am i")){
             //TODO: Tell user where they are
             return true;
+        }
+
+        //Mode specific:
+
+        //Product selection commands
+        if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION){
+            if (matches.contains("add") || matches.contains("new")){
+                textToSpeech.speak("What items would you like to add?",TextToSpeech.QUEUE_FLUSH, null,null);
+                displaySpeechRecognizer();
+            } else {
+                //Add items
+                addItems(matches);
+            }
         }
         return false;
     }
 
-
+    //Add items to shopping list
+    private void addItems(ArrayList<String> matches){
+        if (!gList.contains(matches.get(0).toLowerCase())){
+            gList.add(matches.get(0));
+            adapter.notifyDataSetChanged();
+            textToSpeech.speak("Added " + matches.get(0) + " to shopping list",TextToSpeech.QUEUE_FLUSH, null,null);
+        } else {
+            textToSpeech.speak("Your shopping list already contains "+matches.get(0),TextToSpeech.QUEUE_FLUSH, null,null);
+        }
+    }
         @Override
         protected void onCreate (Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
@@ -172,13 +207,12 @@ public class ProductSelection extends AppCompatActivity {
         }
 
         //Creates grocery list
-
     private void populateListView() {
-        String[] groceries = {"Bananas", "Milk", "Steak", "Lettuce", "Chips", "Bread"};
-        final List<String> groceryList = new ArrayList<String>(Arrays.asList(groceries));
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.groceries, groceryList);
-        ListView list = (ListView) findViewById(R.id.groceryList);
-        list.setAdapter(adapter);
+        String[] groceries = {"bananas", "milk", "steak", "lettuce", "chips", "bread"};
+        gList = new ArrayList<String>(Arrays.asList(groceries));
+        adapter = new ArrayAdapter<String>(this, R.layout.groceries, gList);
+        ListView groceryListView= (ListView) findViewById(groceryList);
+        groceryListView.setAdapter(adapter);
     }
 
 
