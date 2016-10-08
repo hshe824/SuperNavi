@@ -36,18 +36,14 @@ public class ProductSelection extends AppCompatActivity {
 
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
-            if (fromUser){
             switch (progress) {
                 case 0:
-                    currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
+                    productSelection();
                 case 1:
-                    currentOperatingMode = OperatingMode.NAVIGATION;
                     navigate();
                 case 2:
-                    currentOperatingMode = OperatingMode.FREE_ROAM;
                     freeRoam();
-
-            }}
+            }
         }
 
         public void onStartTrackingTouch(SeekBar seekBar) {
@@ -60,6 +56,7 @@ public class ProductSelection extends AppCompatActivity {
 
     //Handles navigate mode
     private void productSelection() {
+        currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
         Log.d("Mode","Entering product selection mode");
         setTitle("SuperNavi - Product Selection");
         modeSelector.setProgress(0);
@@ -69,6 +66,7 @@ public class ProductSelection extends AppCompatActivity {
 
     //Handles navigate mode
     private void navigate() {
+        currentOperatingMode = OperatingMode.NAVIGATION;
         Log.d("Mode","Entering navigation mode");
         setTitle("SuperNavi - Navigate");
         modeSelector.setProgress(1);
@@ -79,6 +77,7 @@ public class ProductSelection extends AppCompatActivity {
 
     //Handles navigate mode
     private void freeRoam() {
+        currentOperatingMode = OperatingMode.FREE_ROAM;
         Log.d("Mode","Entering free roam mode");
         setTitle("SuperNavi - FreeRoam");
         modeSelector.setProgress(2);
@@ -103,11 +102,11 @@ public class ProductSelection extends AppCompatActivity {
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             Log.d("Matches:",matches.toString());
             if (matches.contains("product selection") ||matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
-                productSelection();
+                modeSelector.setProgress(0);
             } else if (matches.contains("navigate") || matches.contains("navigation")) {
-                navigate();
+                modeSelector.setProgress(1);
             } else if (matches.contains("free roam") || matches.contains("free") || matches.contains("roam")) {
-                freeRoam();
+                modeSelector.setProgress(2);
             }
 
         }
