@@ -35,6 +35,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/groceryList"
-        android:layout_marginStart="80dp" />
+        android:layout_marginStart="80dp"
+        android:layout_above="@+id/speakCommand" />
+
+    <Button
+        android:text="Speak Command"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/speakCommand"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/verticalSeekBarWrapper"
+        android:layout_alignStart="@+id/groceryList" />
 
 </RelativeLayout>

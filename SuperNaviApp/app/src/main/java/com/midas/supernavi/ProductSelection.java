@@ -1,6 +1,8 @@
 package com.midas.supernavi;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -11,10 +13,14 @@ import android.widget.SeekBar;
 
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 
+import java.util.List;
+
 public class ProductSelection extends AppCompatActivity {
 
     private VerticalSeekBar modeSelector;
     private OperatingMode currentOperatingMode;
+
+    private static final int SPEECH_REQUEST_CODE = 0;
 
 
     enum OperatingMode {
@@ -32,16 +38,51 @@ public class ProductSelection extends AppCompatActivity {
                     currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
                 case 1:
                     currentOperatingMode = OperatingMode.NAVIGATION;
+                    navigate();
                 case 2:
                     currentOperatingMode = OperatingMode.FREE_ROAM;
+                    freeRoam();
+
             }
         }
-
         public void onStartTrackingTouch(SeekBar seekBar) {}
-
         public void onStopTrackingTouch(SeekBar seekBar) {}
 
     }
+
+    //Handles navigate mode
+    private void navigate(){
+
+
+    }
+
+
+    //Handles navigate mode
+    private void freeRoam(){
+
+
+    }
+
+    private void displaySpeechRecognizer() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        // Start the activity, the intent will be populated with the speech text
+        startActivityForResult(intent, SPEECH_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> results = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+            String spokenText = results.get(0);
+            // Do something with spokenText
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
