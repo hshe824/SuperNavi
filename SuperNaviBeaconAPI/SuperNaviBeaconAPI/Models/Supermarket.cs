@@ -9,9 +9,21 @@ namespace SuperNaviBeaconAPI.Models
     {
         public String name { get; set; }
         public List<Beacon> allBeaconData { get; set; }
+
+        /**
+            Key: Point with X and Y
+            Value: List of all beacon data for that Point
+        */
         private Dictionary<Point, List<Beacon>> map = new Dictionary<Point, List<Beacon>>();
 
+        public Supermarket()
+        {
+            SetUp();
+        }
 
+        /**
+            Setup all the points and the beacon data into the dictionary
+        */
         public void SetUp()
         {
             for(int x = 0; x <= 10; x++)
@@ -36,6 +48,9 @@ namespace SuperNaviBeaconAPI.Models
             }
         }
 
+        /**
+            Retrieve all beacon data at that position
+        */
         public List<Beacon> GetBeaconDataAtPosition(int x, int y)
         {
             return map[new Point()
