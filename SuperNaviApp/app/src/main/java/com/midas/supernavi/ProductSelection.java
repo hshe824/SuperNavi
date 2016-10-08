@@ -16,7 +16,7 @@ import android.widget.SeekBar;
 
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ProductSelection extends AppCompatActivity {
 
@@ -36,7 +36,8 @@ public class ProductSelection extends AppCompatActivity {
 
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
-            switch (progress){
+            if (fromUser){
+            switch (progress) {
                 case 0:
                     currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
                 case 1:
@@ -46,22 +47,41 @@ public class ProductSelection extends AppCompatActivity {
                     currentOperatingMode = OperatingMode.FREE_ROAM;
                     freeRoam();
 
-            }
+            }}
         }
-        public void onStartTrackingTouch(SeekBar seekBar) {}
-        public void onStopTrackingTouch(SeekBar seekBar) {}
+
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
 
     }
 
     //Handles navigate mode
-    private void navigate(){
+    private void productSelection() {
+        Log.d("Mode","Entering product selection mode");
+        setTitle("SuperNavi - Product Selection");
+        modeSelector.setProgress(0);
+
+
+    }
+
+    //Handles navigate mode
+    private void navigate() {
+        Log.d("Mode","Entering navigation mode");
+        setTitle("SuperNavi - Navigate");
+        modeSelector.setProgress(1);
 
 
     }
 
 
     //Handles navigate mode
-    private void freeRoam(){
+    private void freeRoam() {
+        Log.d("Mode","Entering free roam mode");
+        setTitle("SuperNavi - FreeRoam");
+        modeSelector.setProgress(2);
 
 
     }
@@ -77,46 +97,52 @@ public class ProductSelection extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
-        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
-            List<String> results = data.getStringArrayListExtra(
-                    RecognizerIntent.EXTRA_RESULTS);
-            String spokenText = results.get(0);
-            // Do something with spokenText
-            Log.v("test",spokenText);
-        }
         super.onActivityResult(requestCode, resultCode, data);
-    }
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_selection);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        populateListView();
-        //Default mode is product selection
-        this.setTitle("SuperNavi - Product Selection");
-        currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
-        modeSelector = (VerticalSeekBar) findViewById(R.id.modeSelector);
-        modeSelector.setOnSeekBarChangeListener(new modeListener());
-        Button speakCommand = (Button) findViewById(R.id.speakCommand);
-        speakCommand.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                displaySpeechRecognizer();
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            Log.d("Matches:",matches.toString());
+            if (matches.contains("product selection") ||matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
+                productSelection();
+            } else if (matches.contains("navigate") || matches.contains("navigation")) {
+                navigate();
+            } else if (matches.contains("free roam") || matches.contains("free") || matches.contains("roam")) {
+                freeRoam();
             }
-        });
 
+        }
     }
 
-    //Creates grocery list
-    private void populateListView(){
-        String[] groceries = {"Bananas","Milk","Steak","Lettuce","Chips","Bread"};
+
+        @Override
+        protected void onCreate (Bundle savedInstanceState){
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_product_selection);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            populateListView();
+            //Default mode is product selection
+            setTitle("SuperNavi - Product Selection");
+            currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
+            modeSelector = (VerticalSeekBar) findViewById(R.id.modeSelector);
+            modeSelector.setOnSeekBarChangeListener(new modeListener());
+            Button speakCommand = (Button) findViewById(R.id.speakCommand);
+            speakCommand.setOnClickListener(new Button.OnClickListener() {
+                public void onClick(View v) {
+                    displaySpeechRecognizer();
+                }
+            });
+
+        }
+
+        //Creates grocery list
+
+    private void populateListView() {
+        String[] groceries = {"Bananas", "Milk", "Steak", "Lettuce", "Chips", "Bread"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.groceries, groceries);
         ListView list = (ListView) findViewById(R.id.groceryList);
         list.setAdapter(adapter);
     }
-
 
 
     @Override
