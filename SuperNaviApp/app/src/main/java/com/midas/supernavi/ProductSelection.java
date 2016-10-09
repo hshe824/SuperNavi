@@ -190,10 +190,12 @@ public class ProductSelection extends AppCompatActivity {
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
-        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("add")){
+        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add"))){
             addItem(addOrDelete[1]);
         } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
             deleteItem(addOrDelete[1]);
+        } else {
+            tts("Sorry, I could not recognise that last command, please try again");
         }
 
         return false;
@@ -251,10 +253,10 @@ public class ProductSelection extends AppCompatActivity {
 
     //Delete items from shopping list
     private void deleteItem(String grocery) {
-        if (gList.contains(grocery.toLowerCase())) {
+        if (gList.contains(grocery)) {
             gList.remove(grocery);
             adapter.notifyDataSetChanged();
-            tts("Deleted " + grocery + " from shopping list");
+            tts("Removed " + grocery + " from shopping list");
         } else {
             tts("Your shopping list does not contains " + grocery);
         }
