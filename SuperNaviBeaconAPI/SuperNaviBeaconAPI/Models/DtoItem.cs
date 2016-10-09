@@ -14,13 +14,15 @@ namespace SuperNaviBeaconAPI.Models
         public String supermarket { get; set; }
         public int positionX { get; set; }
         public int positionY { get; set; }
+        public String side { get; set; }
 
         public Item toDomainObject()
         {
             Item item = new Item(this.supermarket, this.name)
             {
                 positionX = this.positionX,
-                positionY = this.positionY
+                positionY = this.positionY,
+                side = (Item.Side) Enum.Parse(typeof(Item.Side),this.side,true),
             };
 
             return item;
