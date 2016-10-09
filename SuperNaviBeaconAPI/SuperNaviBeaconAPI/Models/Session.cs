@@ -15,6 +15,8 @@ namespace SuperNaviBeaconAPI.Models
         //Maintains a list of the points travelled
         private List<Point> travelPath = new List<Point>();
 
+        public Dictionary<Point, Item> targets = new Dictionary<Point, Item>();
+
         private List<Item> groceryList = new List<Item>();
 
         private List<Item> supermarketItems = new List<Item>();
@@ -41,12 +43,29 @@ namespace SuperNaviBeaconAPI.Models
             }
 
             orderGroceries();
+            generateTargetPoints();
         }
 
 
         private void orderGroceries() {
             var newList = groceryList.OrderBy(c => c.positionY).ThenBy(c => c.side).ThenBy(c => c.positionX);
             groceryList = newList.ToList();
+        }
+
+        private void generateTargetPoints() {
+            foreach(Item item in groceryList) {
+                int offset = 1;
+                if (item.side == Item.Side.LEFT) {
+                    offset = -1;
+                }
+                Point target = new Point()
+                {
+                    X = item.positionX + offset,
+                    Y = item.positionY,
+                };
+
+                targets.Add(target, item);
+            }
         }
 
         internal void UpdateNewPosition(List<DtoBeacon> beacons)
