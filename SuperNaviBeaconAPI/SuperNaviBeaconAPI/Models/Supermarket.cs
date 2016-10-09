@@ -26,15 +26,26 @@ namespace SuperNaviBeaconAPI.Models
         */
         public void SetUp()
         {
-            for(int x = 0; x <= 10; x++)
+            for(int x = 0; x < 10; x++)
             {
-                for(int y = 0; y <=10; y++)
+                for(int y = 0; y < 10; y++)
                 {
-                    map[new Point()
-                    {
-                        X = x,
-                        Y = y,
-                    }] = new List<Beacon>();
+                    if (x % 3 != 2 || y == 0 || y == 10)
+                        map[new Point()
+                        {
+                            X = x,
+                            Y = y,
+                            walkable = true,
+                        }] = new List<Beacon>();
+
+                    else {
+                        map[new Point()
+                        {
+                            X = x,
+                            Y = y,
+                            walkable = false,
+                        }] = new List<Beacon>();
+                    }
                 }
             }
 
