@@ -12,6 +12,10 @@ namespace SuperNaviBeaconAPI.Models
     public class Session
     {
         public Supermarket supermarket { get; set; }
+
+        //the direction the user is facing
+        private int Direction = 0;
+
         //Maintains a list of the points travelled
         private List<Point> travelPath = new List<Point>();
 
@@ -77,9 +81,9 @@ namespace SuperNaviBeaconAPI.Models
 
             //Go through each X and Y to see which point has the smallest difference in RSSI value of beacons
             //Could be further optimised to start from the last point and spread outwards
-            for(int x = 0; x <= 10; x++)
+            for(int x = 0; x < 10; x++)
             {
-                for(int y = 0; y <= 10; y++)
+                for(int y = 0; y < 10; y++)
                 {
                     //Get all beacon data at the position
                     List<Beacon> beaconsAtThatPosition = supermarket.GetBeaconDataAtPosition(x, y);
@@ -124,12 +128,39 @@ namespace SuperNaviBeaconAPI.Models
                     }
                 }
             }
+
+            travelPath.Add(minimumDifferencePoint);
+            calcDirection();
         }
 
         internal String GetDirection()
         {
-
             throw new NotImplementedException();
+        }
+
+        private void calcDirection() {
+            Point current = travelPath[travelPath.Count - 1];
+            Point prev = travelPath[travelPath.Count - 2];
+
+            if (current.X == prev.X && current.Y == prev.Y) {
+                return;
+            }
+
+            if (current.Y > prev.Y)
+            {
+                this.Direction = 0;
+            }
+            else if (current.Y < prev.Y) {
+                this.Direction = 180;
+            }
+
+            if (current.X > prev.X)
+            {
+                this.Direction = 90;
+            }
+            else if (current.X < prev.X) {
+                this.Direction = 270;
+            }
         }
     }
 }
