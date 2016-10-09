@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.midas.supernavi.R.id.groceryList;
+import static com.midas.supernavi.R.id.text;
 
 public class ProductSelection extends AppCompatActivity {
 
@@ -96,7 +97,7 @@ public class ProductSelection extends AppCompatActivity {
             }
         });
         textToSpeech.setSpeechRate((float) 0.85);
-        textToSpeech.speak("Press speak button on the bottom of the screen and say an item to add it to the shopping list",TextToSpeech.QUEUE_FLUSH, null, null);
+        textToSpeech.speak("Press speak button on the bottom of the screen and say an item to add it to the shopping list", TextToSpeech.QUEUE_FLUSH, null, null);
 
 
     }
@@ -180,8 +181,11 @@ public class ProductSelection extends AppCompatActivity {
             tts("Exiting app");
             finish();
             return true;
-        } else if (matches.contains("help")){
+        } else if (matches.contains("help")) {
             help(matches);
+            return true;
+        } else if (matches.contains("read shopping list")) {
+            readShoppingList();
             return true;
         }
 
@@ -195,8 +199,18 @@ public class ProductSelection extends AppCompatActivity {
         return false;
     }
 
-    private void help(ArrayList<String> matches){
-        switch (currentOperatingMode){
+    private void readShoppingList() {
+        tts("Your shopping list contains:");
+        Log.v("Grocery list:", gList.toString());
+        for (String grocery : gList) {
+            Log.d("grocery:", grocery);
+            tts(grocery);
+        }
+
+    }
+
+    private void help(ArrayList<String> matches) {
+        switch (currentOperatingMode) {
             case PRODUCT_SELECTION:
                 tts("You are in product selection mode. Simply click the speak button and say an item you want to add to your shopping list");
                 break;
@@ -212,8 +226,16 @@ public class ProductSelection extends AppCompatActivity {
 
     }
 
-    private void tts(String toSpeak){
+    private void tts(String toSpeak) {
         textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
+        while (textToSpeech.isSpeaking()) {
+
+        }
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e){
+            Log.e("Exception:",e.getMessage());
+        }
     }
 
     //Add items to shopping list
@@ -223,16 +245,16 @@ public class ProductSelection extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             tts("Added " + matches.get(0) + " to shopping list");
         } else {
-            tts("Your shopping list already contains "+ matches.get(0));
+            tts("Your shopping list already contains " + matches.get(0));
         }
     }
-
 
 
     //Creates grocery list
     private void populateListView() {
         String[] groceries = {"bananas", "milk", "steak", "lettuce", "chips", "bread"};
         gList = new ArrayList<String>(Arrays.asList(groceries));
+
         adapter = new ArrayAdapter<String>(this, R.layout.groceries, gList);
         ListView groceryListView = (ListView) findViewById(groceryList);
         groceryListView.setAdapter(adapter);
