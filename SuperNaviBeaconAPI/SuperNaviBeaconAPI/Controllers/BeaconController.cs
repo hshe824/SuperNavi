@@ -50,7 +50,8 @@ namespace SuperNaviBeaconAPI.Controllers
             TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, beacon.PartitionKey))
                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, beacon.RowKey));
 
-            Beacon beaconRetrieved = beaconTable.ExecuteQuery(query).First();
+            IEnumerable<Beacon> result = beaconTable.ExecuteQuery(query);
+            Beacon beaconRetrieved = result.Count() > 0 ? result.First() : null;
             
             //If there was no beacon data for this position for this specific beacon, insert new
             if(beaconRetrieved == null)
