@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements BeaconConsumer {
+public class
+MainActivity extends AppCompatActivity implements BeaconConsumer {
 
     private static final String TAG = "MainActivity";
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     private List<Beacon> currentBeaconList;
 
     private final String URL = "http://supernavibeaconapi.azurewebsites.net/api/Beacon";
+    // final String URL = "http://localhost:43865/api/Beacon";
     private RequestQueue requestQueue;
 
     @Override
@@ -58,10 +60,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         sendButton.setOnClickListener(buttonHandler);
 
         beaconManager = BeaconManager.getInstanceForApplication(getApplicationContext());
-        beaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        beaconManager.setForegroundBetweenScanPeriod(2000l);
-        beaconManager.setBackgroundScanPeriod(5000l);
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.setForegroundBetweenScanPeriod(0l);
+        beaconManager.setForegroundScanPeriod(5000l);
         beaconManager.bind(this);
 
 
@@ -115,45 +116,19 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
                        " x: " + xCoordinateTextField.getText().toString() +
                        " y: " + yCoordinateTextField.getText().toString());
 
-
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("uuid",   "A");
-                jsonObject.put("majorid", 10);
-                jsonObject.put("minorid", 5);
-                jsonObject.put("rssi",   "A");
-                jsonObject.put("positionX", 3);
-                jsonObject.put("positionY", 5);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject jsonObject) {
-                    Log.e(TAG, "Response " + jsonObject.toString());
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.e(TAG, "Error: " + volleyError.getMessage());
-                }
-            });
-
-            requestQueue.add(jsonRequest);
-
-
-            /*
             for(Beacon beacon : currentBeaconList){
 
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("uuid", beacon.getId1().toString());
-                    jsonObject.put("major", beacon.getId2().toInt());
-                    jsonObject.put("minor", beacon.getId3().toInt());
+                    jsonObject.put("majorid", beacon.getId2().toInt());
+                    jsonObject.put("minorid", beacon.getId3().toInt());
                     jsonObject.put("positionX", Integer.parseInt(xCoordinateTextField.getText().toString()));
                     jsonObject.put("positionY", Integer.parseInt(yCoordinateTextField.getText().toString()));
-                    jsonObject.put("rssi", Integer.toString(beacon.getRssi()));
+                    jsonObject.put("rssi", beacon.getRssi());
+                    jsonObject.put("supermarket", supermarketTextField.getText().toString());
+                    jsonObject.put("count", 0);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -169,9 +144,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
                     }
                 });
-
+                Log.d(TAG, jsonObject.toString());
                 requestQueue.add(jsonRequest);
-            }*/
+            }
 
         }
     };
@@ -179,21 +154,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
-        beaconManager.addRangeNotifier(new RangeNotifier() {
+        beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-                Iterator<Beacon> iterator = collection.iterator();
-                int count = 0;
-                while(iterator.hasNext()){
-                    Beacon beacon = iterator.next();
-                    Log.d(TAG, "Beacon ID1: " + beacon.getId1());
-                    Log.d(TAG, "Beacon ID2: " + beacon.getId2());
-                    Log.d(TAG, "Beacon ID3: " + beacon.getId3());
-                    Log.d(TAG, "Beacon ID3: " + beacon.getRssi());
-                    count++;
-                }
-
-                Log.d(TAG, "Count: " + count);
+                Log.d(TAG, "Count: " + collection.size());
 
                 currentBeaconList = new ArrayList<>(collection);
             }
