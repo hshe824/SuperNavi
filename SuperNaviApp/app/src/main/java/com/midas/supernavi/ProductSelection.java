@@ -190,18 +190,12 @@ public class ProductSelection extends AppCompatActivity {
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
-        } else if (addOrDelete[0].equals("add")){
+        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("add")){
             addItem(addOrDelete[1]);
-        } else if (addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
+        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
             deleteItem(addOrDelete[1]);
         }
 
-        //Mode specific:
-
-        //Product selection commands
-        if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
-            //Add items
-        }
         return false;
     }
 
