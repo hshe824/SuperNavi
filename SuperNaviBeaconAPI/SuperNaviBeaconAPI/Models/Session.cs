@@ -20,10 +20,14 @@ namespace SuperNaviBeaconAPI.Models
         //Maintains a list of the points travelled
         private List<Point> travelPath = new List<Point>();
 
+        //Mapping targets to points
         public Dictionary<Item, Point> targets = new Dictionary<Item, Point>();
+        public Point currentTarget = new Point();
 
+        //List of grocery items from the user
         private List<Item> groceryList = new List<Item>();
 
+        //List of all grocery items
         private List<Item> supermarketItems = new List<Item>();
 
         private CloudTable itemTable = CloudStorageAccount.Parse(
@@ -51,6 +55,12 @@ namespace SuperNaviBeaconAPI.Models
             generateTargetPoints();
         }
 
+        //Use this to indicate the item was collected
+        public void collectedItem() {
+            groceryList.RemoveAt(0);
+            currentTarget = targets[groceryList[0]];
+        }
+
         //Ordering groceries to be listed by the row, side and depth on the row
         private void orderGroceries() {
             var newList = groceryList.OrderBy(c => c.positionY).ThenBy(c => c.side).ThenBy(c => c.positionX);
@@ -64,14 +74,16 @@ namespace SuperNaviBeaconAPI.Models
                 if (item.side == Item.Side.LEFT) {
                     offset = -1;
                 }
-                Point target = new Point()
+                Point temp = new Point()
                 {
                     X = item.positionX + offset,
                     Y = item.positionY,
                 };
 
-                targets.Add(item, target);
+                targets.Add(item, temp);
             }
+
+            currentTarget = targets[groceryList[0]];
         }
 
         internal void UpdateNewPosition(List<DtoBeacon> beacons)
@@ -132,7 +144,6 @@ namespace SuperNaviBeaconAPI.Models
             }
 
             travelPath.Add(minimumDifferencePoint);
-            calcDirection();
         }
 
         internal String GetDirection()
@@ -140,12 +151,11 @@ namespace SuperNaviBeaconAPI.Models
             StringBuilder command = new StringBuilder();
 
             Point current = travelPath[travelPath.Count - 1];
-            Point target = targets[groceryList[0]];
 
             //if at target alert them
-            if (current.X == target.X && current.Y == target.Y) {
+            if (current.X == currentTarget.X && current.Y == currentTarget.Y) {
                 command.Append(groceryList[0].name + " is on the ");
-                if (groceryList[0].side == Item.Side.LEFT)
+                if ((groceryList[0].side == Item.Side.LEFT && Direction == 0 ) || (groceryList[0].side == Item.Side.RIGHT && Direction == 180))
                 {
                     command.Append("right. ");
                 }
@@ -153,14 +163,11 @@ namespace SuperNaviBeaconAPI.Models
                     command.Append("left. ");
                 }
 
-                groceryList.RemoveAt(0);
-                target = targets[groceryList[0]];
-
                 command.Append("Then ");
             }
 
-
-            calculatePath(current, target);
+            calcDirection();
+            calculatePath(current, currentTarget);
 
             return command.ToString();
         }
@@ -191,7 +198,7 @@ namespace SuperNaviBeaconAPI.Models
             }
         }
 
-        private void calculatePath(Point current, Point target)
+        private void calculatePath(Point current, Point end)
         {
 
         }
