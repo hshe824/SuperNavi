@@ -19,20 +19,30 @@ namespace SuperNaviBeaconAPI.Controllers
         // GET: api/Beacon
         [Route("~/api/beacon/{supermarket}")]
         [HttpGet]
-        public IEnumerable<Beacon> Get(String supermarket)
+        public IEnumerable<DtoBeacon> Get(String supermarket)
         {
-            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket));
-            return beaconTable.ExecuteQuery(query).ToList();
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"));
+            List<DtoBeacon> dtoList = new List<DtoBeacon>();
+            foreach (Beacon beacon in beaconTable.ExecuteQuery(query).ToList())
+            {
+                dtoList.Add(beacon.ToDto());
+            }
+            return dtoList;
         }
 
         // GET: api/Beacon/5
         [Route("~/api/beacon/{supermarket}/{id}")]
         [HttpGet]
-        public IEnumerable<Beacon> Get(String supermarket, String id)
+        public IEnumerable<DtoBeacon> Get(String supermarket, String id)
         {
-            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket))
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Beacon"))
                 .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
-            return beaconTable.ExecuteQuery(query).ToList();
+            List<DtoBeacon> dtoList = new List<DtoBeacon>();
+            foreach (Beacon beacon in beaconTable.ExecuteQuery(query).ToList())
+            {
+                dtoList.Add(beacon.ToDto());
+            }
+            return dtoList;
         }
 
         // POST: api/Beacon
