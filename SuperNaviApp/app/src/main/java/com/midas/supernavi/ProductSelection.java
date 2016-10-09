@@ -156,22 +156,22 @@ public class ProductSelection extends AppCompatActivity {
     private boolean checkCommand(ArrayList<String> matches) {
         //Global commands
         if (matches.contains("product selection mode") || matches.contains("product selection") || matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
-            modeSelector.setProgress(0);
             if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
                 tts("You are already in product selection mode!");
             }
+            modeSelector.setProgress(0);
             return true;
         } else if (matches.contains("navigate") || matches.contains("navigation") || matches.contains("navigation mode")) {
-            modeSelector.setProgress(1);
-            if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
+            if (currentOperatingMode == OperatingMode.NAVIGATION) {
                 tts("You are already in navigation mode!");
             }
+            modeSelector.setProgress(1);
             return true;
         } else if (matches.contains("free roam mode") || matches.contains("free roam") || matches.contains("roam")) {
-            modeSelector.setProgress(2);
-            if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
+            if (currentOperatingMode == OperatingMode.FREE_ROAM) {
                 tts("You are already in free roam mode!");
             }
+            modeSelector.setProgress(2);
             return true;
         } else if (matches.contains("where am i")) {
             //TODO: Tell user where they are
