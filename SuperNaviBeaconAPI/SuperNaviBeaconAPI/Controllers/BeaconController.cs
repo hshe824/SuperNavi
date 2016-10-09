@@ -65,7 +65,7 @@ namespace SuperNaviBeaconAPI.Controllers
                 var totalrssi = rssi * beaconRetrieved.count;
 
                 //Calculate the new average with the data that has just been recieved
-                beaconRetrieved.rssi = (rssi + beacon.rssi) / (beaconRetrieved.count + 1);
+                beaconRetrieved.rssi = (totalrssi + beacon.rssi) / (beaconRetrieved.count + 1);
                 beaconRetrieved.count = beaconRetrieved.count + 1;
             }
             

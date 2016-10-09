@@ -31,7 +31,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements BeaconConsumer {
+public class
+MainActivity extends AppCompatActivity implements BeaconConsumer {
 
     private static final String TAG = "MainActivity";
 
@@ -58,10 +59,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         sendButton.setOnClickListener(buttonHandler);
 
         beaconManager = BeaconManager.getInstanceForApplication(getApplicationContext());
-        beaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        beaconManager.setForegroundBetweenScanPeriod(2000l);
-        beaconManager.setBackgroundScanPeriod(5000l);
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.setForegroundBetweenScanPeriod(0l);
+        beaconManager.setForegroundScanPeriod(5000l);
         beaconManager.bind(this);
 
 
@@ -179,21 +179,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
-        beaconManager.addRangeNotifier(new RangeNotifier() {
+        beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-                Iterator<Beacon> iterator = collection.iterator();
-                int count = 0;
-                while(iterator.hasNext()){
-                    Beacon beacon = iterator.next();
-                    Log.d(TAG, "Beacon ID1: " + beacon.getId1());
-                    Log.d(TAG, "Beacon ID2: " + beacon.getId2());
-                    Log.d(TAG, "Beacon ID3: " + beacon.getId3());
-                    Log.d(TAG, "Beacon ID3: " + beacon.getRssi());
-                    count++;
-                }
-
-                Log.d(TAG, "Count: " + count);
+                Log.d(TAG, "Count: " + collection.size());
 
                 currentBeaconList = new ArrayList<>(collection);
             }
