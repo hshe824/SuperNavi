@@ -155,6 +155,9 @@ public class ProductSelection extends AppCompatActivity {
     }
 
     private boolean checkCommand(ArrayList<String> matches) {
+
+        String[] addOrDelete = matches.get(0).split(" ");
+
         //Global commands
         if (matches.contains("product selection mode") || matches.contains("product selection") || matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
             if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
@@ -187,6 +190,10 @@ public class ProductSelection extends AppCompatActivity {
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
+        } else if (addOrDelete[0].equals("add")){
+            addItem(addOrDelete[1]);
+        } else if (addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
+            deleteItem(addOrDelete[1]);
         }
 
         //Mode specific:
@@ -194,7 +201,6 @@ public class ProductSelection extends AppCompatActivity {
         //Product selection commands
         if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
             //Add items
-            addItems(matches);
         }
         return false;
     }
@@ -239,13 +245,24 @@ public class ProductSelection extends AppCompatActivity {
     }
 
     //Add items to shopping list
-    private void addItems(ArrayList<String> matches) {
-        if (!gList.contains(matches.get(0).toLowerCase())) {
-            gList.add(matches.get(0));
+    private void addItem(String grocery) {
+        if (!gList.contains(grocery.toLowerCase())) {
+            gList.add(grocery);
             adapter.notifyDataSetChanged();
-            tts("Added " + matches.get(0) + " to shopping list");
+            tts("Added " + grocery + " to shopping list");
         } else {
-            tts("Your shopping list already contains " + matches.get(0));
+            tts("Your shopping list already contains " + grocery);
+        }
+    }
+
+    //Delete items from shopping list
+    private void deleteItem(String grocery) {
+        if (gList.contains(grocery.toLowerCase())) {
+            gList.remove(grocery);
+            adapter.notifyDataSetChanged();
+            tts("Deleted " + grocery + " from shopping list");
+        } else {
+            tts("Your shopping list does not contains " + grocery);
         }
     }
 
