@@ -6,6 +6,7 @@ using SuperNaviBeaconAPI.Models;
 using Microsoft.WindowsAzure.Storage.Table;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.Azure;
+using System.Text;
 
 namespace SuperNaviBeaconAPI.Models
 {
@@ -19,7 +20,7 @@ namespace SuperNaviBeaconAPI.Models
         //Maintains a list of the points travelled
         private List<Point> travelPath = new List<Point>();
 
-        public Dictionary<Point, Item> targets = new Dictionary<Point, Item>();
+        public Dictionary<Item, Point> targets = new Dictionary<Item, Point>();
 
         private List<Item> groceryList = new List<Item>();
 
@@ -69,7 +70,7 @@ namespace SuperNaviBeaconAPI.Models
                     Y = item.positionY,
                 };
 
-                targets.Add(target, item);
+                targets.Add(item, target);
             }
         }
 
@@ -136,7 +137,32 @@ namespace SuperNaviBeaconAPI.Models
 
         internal String GetDirection()
         {
-            throw new NotImplementedException();
+            StringBuilder command = new StringBuilder();
+
+            Point current = travelPath[travelPath.Count - 1];
+            Point target = targets[groceryList[0]];
+
+            //if at target alert them
+            if (current.X == target.X && current.Y == target.Y) {
+                command.Append(groceryList[0].name + " is on the ");
+                if (groceryList[0].side == Item.Side.LEFT)
+                {
+                    command.Append("right. ");
+                }
+                else {
+                    command.Append("left. ");
+                }
+
+                groceryList.RemoveAt(0);
+                target = targets[groceryList[0]];
+
+                command.Append("Then ");
+            }
+
+
+            calculatePath(current, target);
+
+            return command.ToString();
         }
 
         //Calculating the direction user is facing from current point relative to next point
@@ -163,6 +189,11 @@ namespace SuperNaviBeaconAPI.Models
             else if (current.X < prev.X) {
                 this.Direction = 270;
             }
+        }
+
+        private void calculatePath(Point current, Point target)
+        {
+
         }
     }
 }
