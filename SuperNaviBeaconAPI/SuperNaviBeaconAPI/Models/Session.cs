@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using SuperNaviBeaconAPI.Models;
+using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.Azure;
 
 namespace SuperNaviBeaconAPI.Models
 {
@@ -11,11 +14,40 @@ namespace SuperNaviBeaconAPI.Models
         public Supermarket supermarket { get; set; }
         //Maintains a list of the points travelled
         private List<Point> travelPath = new List<Point>();
-        
+
+        private List<Item> groceryList = new List<Item>();
+
+        private List<Item> supermarketItems = new List<Item>();
+
+        private CloudTable itemTable = CloudStorageAccount.Parse(
+            CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Item");
+
+
         /**
             Update the current position given the new beacon data
         */
-        public Session(){}
+        public Session(List<DtoItem> groc, Supermarket name, List<Item> supermarketItems)
+        {
+            this.supermarket = name;
+            this.supermarketItems = supermarketItems;
+
+            //Finding all the lists in 
+            foreach(DtoItem dItem in groc) {
+                foreach (Item item in this.supermarketItems) {
+                    if (dItem.name.ToLower().Equals(item.name.ToLower())) {
+                        groceryList.Add(item);
+                    }
+                }
+            }
+
+            orderGroceries();
+        }
+
+
+        private void orderGroceries() {
+            var newList = groceryList.OrderBy(c => c.positionY).ThenBy(c => c.side).ThenBy(c => c.positionX);
+            groceryList = newList.ToList();
+        }
 
         internal void UpdateNewPosition(List<DtoBeacon> beacons)
         {

@@ -20,6 +20,9 @@ namespace SuperNaviBeaconAPI.Controllers
         private CloudTable beaconTable = CloudStorageAccount.Parse(
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Beacon");
 
+        private CloudTable itemTable = CloudStorageAccount.Parse(
+            CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Item");
+
         // GET api/Navigation
         public IEnumerable<string> Get()
         {
@@ -65,6 +68,7 @@ namespace SuperNaviBeaconAPI.Controllers
             TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarketName));
             List<Beacon> allBeaconData = beaconTable.ExecuteQuery(query).ToList();
 
+
             //Make the supermarket with the name and the beacon data
             Supermarket supermarket = new Supermarket()
             {
@@ -72,11 +76,13 @@ namespace SuperNaviBeaconAPI.Controllers
                 allBeaconData = allBeaconData,
             };
 
+            //Getting all items from the supermarket
+            List<Item> supermarketItems = new List<Item>();
+            TableQuery<Item> queryItems = new TableQuery<Item>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket.name));
+            foreach (Item item in itemTable.ExecuteQuery(queryItems)) {supermarketItems.Add(item);}
+
             //Make the session
-            Session session = new Session()
-            {
-                supermarket = supermarket,
-            };
+            Session session = new Session(items, supermarket, supermarketItems);
             
             //Store the session
             connections[ipAddress] = session;
