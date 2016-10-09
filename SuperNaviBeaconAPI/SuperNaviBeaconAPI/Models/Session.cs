@@ -50,12 +50,13 @@ namespace SuperNaviBeaconAPI.Models
             generateTargetPoints();
         }
 
-
+        //Ordering groceries to be listed by the row, side and depth on the row
         private void orderGroceries() {
             var newList = groceryList.OrderBy(c => c.positionY).ThenBy(c => c.side).ThenBy(c => c.positionX);
             groceryList = newList.ToList();
         }
 
+        //Generating the target points user needs to travel to
         private void generateTargetPoints() {
             foreach(Item item in groceryList) {
                 int offset = 1;
@@ -138,6 +139,7 @@ namespace SuperNaviBeaconAPI.Models
             throw new NotImplementedException();
         }
 
+        //Calculating the direction user is facing from current point relative to next point
         private void calcDirection() {
             Point current = travelPath[travelPath.Count - 1];
             Point prev = travelPath[travelPath.Count - 2];
