@@ -59,10 +59,10 @@ namespace SuperNaviBeaconAPI.Controllers
             Pass in the items that needs to be picked up as well as the supermarket name
             Session is created
         */
-        public HttpStatusCode Post(List<DtoItem> items, String supermarketName)
+        public HttpStatusCode Post(List<DtoItem> items, String supermarketName, String phoneID)
         {
             //Get IP Address
-            String ipAddress = Request.GetOwinContext().Request.RemoteIpAddress;
+            String ipAddress = phoneID;
 
             //Get all beacon data for the supermarket
             TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarketName));
@@ -94,9 +94,9 @@ namespace SuperNaviBeaconAPI.Controllers
         /*
             Get the direction given the current position
         */
-        public String Post(List<DtoBeacon> beacons)
+        public String Post(List<DtoBeacon> beacons, String phoneID)
         {
-            String ipAddress = Request.GetOwinContext().Request.RemoteIpAddress;
+            String ipAddress = phoneID;
             //Retrieve session with IP Address
             Session session = connections[ipAddress];
             
