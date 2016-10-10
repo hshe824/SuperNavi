@@ -15,7 +15,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
+import com.midas.supernavi.Models.DtoItem;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.midas.supernavi.R.id.groceryList;
-import static com.midas.supernavi.R.id.text;
+
 
 public class ProductSelection extends AppCompatActivity {
 
@@ -118,8 +125,40 @@ public class ProductSelection extends AppCompatActivity {
         Log.d("Mode", "Entering navigation mode");
         setTitle("SuperNavi - Navigation");
         tts("Entering navigation mode");
+        List<DtoItem> dtoList = sanitiseList();
+        sendRequest(dtoList);
 
 
+    }
+
+    private void sendRequest(List<DtoItem> dtoList){
+
+        String url = "http://supernavibeaconapi.azurewebsites.net/api/item";
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //mTxtDisplay.setText("Response: " + response.toString());
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
+
+    }
+
+    private List<DtoItem> sanitiseList(){
+        ArrayList<DtoItem> dtoList = new ArrayList<DtoItem>();
+        for (String item: gList){
+            DtoItem dtoItem = new DtoItem(item);
+            dtoList.add(dtoItem);
+        }
+        return dtoList;
     }
 
 
