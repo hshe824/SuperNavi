@@ -126,7 +126,7 @@ namespace SuperNaviBeaconAPI.Models
                         {
                             //Calculate the difference using sum of squared differences
                             Beacon beaconTemplate = beaconsAtThatPositionMap[key];
-                            localScore += (int)(Math.Pow(beaconChallenge.rssi, 2) - Math.Pow(beaconTemplate.rssi, 2));
+                            localScore += Math.Abs((int)(Math.Pow(beaconChallenge.rssi, 2) - Math.Pow(beaconTemplate.rssi, 2)));
                         }
                         else
                         {
