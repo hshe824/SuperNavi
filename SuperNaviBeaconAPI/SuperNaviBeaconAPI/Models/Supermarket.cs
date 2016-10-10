@@ -30,7 +30,7 @@ namespace SuperNaviBeaconAPI.Models
             {
                 for(int y = 0; y < 10; y++)
                 {
-                    if (x % 3 != 2 || y == 0 || y == 10)
+                    if (x % 3 != 2 || y == 0 || y == 9)
                         map[new Point()
                         {
                             X = x,
