@@ -51,11 +51,16 @@ namespace SuperNaviBeaconAPI.Models
 
             foreach(Beacon beacon in allBeaconData)
             {
-                map[new Point()
+                try {
+                    map[new Point()
+                    {
+                        X = beacon.positionX,
+                        Y = beacon.positionY,
+                    }].Add(beacon);
+                } catch(Exception e)
                 {
-                    X = beacon.positionX,
-                    Y = beacon.positionY,
-                }].Add(beacon);
+                    var x = 1 + 1;
+                }
             }
         }
 
