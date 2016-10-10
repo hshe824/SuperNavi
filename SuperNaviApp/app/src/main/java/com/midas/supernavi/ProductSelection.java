@@ -246,7 +246,7 @@ public class ProductSelection extends AppCompatActivity {
         for (int i = 1; i < groceryStrArray.length; i++) {
             strBuilder.append(groceryStrArray[i]+" ");
         }
-        String grocery = strBuilder.toString();
+        String grocery = strBuilder.toString().trim();
         if (!gList.contains(grocery)) {
             gList.add(grocery);
             adapter.notifyDataSetChanged();
@@ -262,13 +262,14 @@ public class ProductSelection extends AppCompatActivity {
         for (int i = 1; i < groceryStrArray.length; i++) {
             strBuilder.append(groceryStrArray[i]+" ");
         }
-        String grocery = strBuilder.toString();
+        String grocery = strBuilder.toString().trim();
+        Log.d("Deleted:", grocery);
         if (gList.contains(grocery)) {
             gList.remove(grocery);
             adapter.notifyDataSetChanged();
             tts("Removed " + grocery + " from shopping list");
         } else {
-            tts("Your shopping list does not contains " + grocery);
+            tts("Your shopping list does not contain " + grocery);
         }
     }
 
