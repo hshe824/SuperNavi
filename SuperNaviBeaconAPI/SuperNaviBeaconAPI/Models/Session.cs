@@ -16,7 +16,6 @@ namespace SuperNaviBeaconAPI.Models
 
         //the direction the user is facing
         private int Direction = 0;
-
         //Maintains a list of the points travelled
         private List<Point> travelPath = new List<Point>();
 
@@ -26,19 +25,25 @@ namespace SuperNaviBeaconAPI.Models
 
         //List of grocery items from the user
         private List<Item> groceryList = new List<Item>();
-
         //List of all grocery items
         private List<Item> supermarketItems = new List<Item>();
 
         private CloudTable itemTable = CloudStorageAccount.Parse(
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Item");
 
+        //Stores all intermediate points between current position and target
+        private List<Point> intermediatePoints = new List<Point>();
+
+        private Dictionary<int, string> relativeDirectionMap = new Dictionary<int, string>();
+
+        private String prevCommand;
 
         /**
             Update the current position given the new beacon data
         */
         public Session(List<DtoItem> groc, Supermarket name, List<Item> supermarketItems)
         {
+            populateRelativeMap();
             this.supermarket = name;
             this.supermarketItems = supermarketItems;
 
@@ -167,7 +172,11 @@ namespace SuperNaviBeaconAPI.Models
             }
 
             calcDirection();
-            calculatePath(current, currentTarget);
+            command.Append(calculatePath(current, currentTarget));
+
+            if (command.ToString().Equals(prevCommand)) {
+                return "";
+            }
 
             return command.ToString();
         }
@@ -198,9 +207,56 @@ namespace SuperNaviBeaconAPI.Models
             }
         }
 
-        private void calculatePath(Point current, Point end)
+        private string calculatePath(Point current, Point end)
         {
+            int absDir = 0;
+            //If X is the same, then just need to walk up or down
+            if (current.X == end.X)
+            {
+                if (current.Y > end.Y)
+                {
+                    absDir = 180;
+                }
+                else {
+                    absDir = 0;
+                }
+            }
+            //Other wise walk to end of aisles
+            else if (current.Y != 0 || current.Y != 10)
+            {
+                if ((current.Y - 0) > 5)
+                {
+                    absDir = 180;
+                }
+                else {
+                    absDir = 0;
+                }
+            }
+            //else walk to correct aisle
+            else {
+                if (current.X < currentTarget.X)
+                {
+                    absDir = 90;
+                }
+                else {
+                    absDir = 270;
+                }
+            }
 
+            String command = relativeDirectionMap[(absDir - Direction)];
+            return command;
         }
+
+        private void populateRelativeMap() {
+            relativeDirectionMap.Add(0, "Keep Going Straight.");
+            relativeDirectionMap.Add(90, "Turn Left.");
+            relativeDirectionMap.Add(180, "Turn Around.");
+            relativeDirectionMap.Add(270, "Turn Right.");
+            relativeDirectionMap.Add(360, "Keep Going Straight.");
+            relativeDirectionMap.Add(-90, "Turn Left.");
+            relativeDirectionMap.Add(-180, "Turn Around.");
+            relativeDirectionMap.Add(-270, "Turn Right.");
+        }
+
     }
 }
