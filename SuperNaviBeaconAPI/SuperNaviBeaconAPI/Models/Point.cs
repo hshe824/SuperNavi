@@ -16,5 +16,10 @@ namespace SuperNaviBeaconAPI.Models
         {
             return X * 31 + Y;
         }
+
+        public override bool Equals(Point obj)
+        {
+            return (X == obj.X && Y == obj.Y);
+        }
     }
 }
