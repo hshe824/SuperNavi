@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.midas.supernavi.R.id.groceryList;
+import static com.midas.supernavi.R.id.text;
 
 public class ProductSelection extends AppCompatActivity {
 
@@ -96,7 +97,7 @@ public class ProductSelection extends AppCompatActivity {
             }
         });
         textToSpeech.setSpeechRate((float) 0.85);
-        textToSpeech.speak("Press speak button on the bottom of the screen and say an item to add it to the shopping list",TextToSpeech.QUEUE_FLUSH, null, null);
+        textToSpeech.speak("Press speak button on the bottom of the screen and say an item to add it to the shopping list", TextToSpeech.QUEUE_FLUSH, null, null);
 
 
     }
@@ -154,24 +155,27 @@ public class ProductSelection extends AppCompatActivity {
     }
 
     private boolean checkCommand(ArrayList<String> matches) {
+
+        String[] addOrDelete = matches.get(0).split(" ");
+
         //Global commands
         if (matches.contains("product selection mode") || matches.contains("product selection") || matches.contains("selection") || matches.contains("select") || matches.contains("product")) {
-            modeSelector.setProgress(0);
             if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
                 tts("You are already in product selection mode!");
             }
+            modeSelector.setProgress(0);
             return true;
         } else if (matches.contains("navigate") || matches.contains("navigation") || matches.contains("navigation mode")) {
-            modeSelector.setProgress(1);
-            if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
+            if (currentOperatingMode == OperatingMode.NAVIGATION) {
                 tts("You are already in navigation mode!");
             }
+            modeSelector.setProgress(1);
             return true;
         } else if (matches.contains("free roam mode") || matches.contains("free roam") || matches.contains("roam")) {
-            modeSelector.setProgress(2);
-            if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
+            if (currentOperatingMode == OperatingMode.FREE_ROAM) {
                 tts("You are already in free roam mode!");
             }
+            modeSelector.setProgress(2);
             return true;
         } else if (matches.contains("where am i")) {
             //TODO: Tell user where they are
@@ -180,23 +184,35 @@ public class ProductSelection extends AppCompatActivity {
             tts("Exiting app");
             finish();
             return true;
-        } else if (matches.contains("help")){
+        } else if (matches.contains("help")) {
             help(matches);
             return true;
+        } else if (matches.contains("read shopping list")) {
+            readShoppingList();
+            return true;
+        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add"))){
+            addItem(addOrDelete);
+        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
+            deleteItem(addOrDelete);
+        } else {
+            tts("Sorry, I could not recognise that last command, please try again");
         }
 
-        //Mode specific:
-
-        //Product selection commands
-        if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
-            //Add items
-            addItems(matches);
-        }
         return false;
     }
 
-    private void help(ArrayList<String> matches){
-        switch (currentOperatingMode){
+    private void readShoppingList() {
+        tts("Your shopping list contains:");
+        Log.v("Grocery list:", gList.toString());
+        for (String grocery : gList) {
+            Log.d("grocery:", grocery);
+            tts(grocery);
+        }
+
+    }
+
+    private void help(ArrayList<String> matches) {
+        switch (currentOperatingMode) {
             case PRODUCT_SELECTION:
                 tts("You are in product selection mode. Simply click the speak button and say an item you want to add to your shopping list");
                 break;
@@ -212,27 +228,57 @@ public class ProductSelection extends AppCompatActivity {
 
     }
 
-    private void tts(String toSpeak){
+    private void tts(String toSpeak) {
         textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
-    }
+        while (textToSpeech.isSpeaking()) {
 
-    //Add items to shopping list
-    private void addItems(ArrayList<String> matches) {
-        if (!gList.contains(matches.get(0).toLowerCase())) {
-            gList.add(matches.get(0));
-            adapter.notifyDataSetChanged();
-            tts("Added " + matches.get(0) + " to shopping list");
-        } else {
-            tts("Your shopping list already contains "+ matches.get(0));
+        }
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e){
+            Log.e("Exception:",e.getMessage());
         }
     }
 
+    //Add items to shopping list
+    private void addItem(String[] groceryStrArray) {
+        StringBuilder strBuilder = new StringBuilder();
+        for (int i = 1; i < groceryStrArray.length; i++) {
+            strBuilder.append(groceryStrArray[i]+" ");
+        }
+        String grocery = strBuilder.toString().trim();
+        if (!gList.contains(grocery)) {
+            gList.add(grocery);
+            adapter.notifyDataSetChanged();
+            tts("Added " + grocery + " to shopping list");
+        } else {
+            tts("Your shopping list already contains " + grocery);
+        }
+    }
+
+    //Delete items from shopping list
+    private void deleteItem(String[] groceryStrArray) {
+        StringBuilder strBuilder = new StringBuilder();
+        for (int i = 1; i < groceryStrArray.length; i++) {
+            strBuilder.append(groceryStrArray[i]+" ");
+        }
+        String grocery = strBuilder.toString().trim();
+        Log.d("Deleted:", grocery);
+        if (gList.contains(grocery)) {
+            gList.remove(grocery);
+            adapter.notifyDataSetChanged();
+            tts("Removed " + grocery + " from shopping list");
+        } else {
+            tts("Your shopping list does not contain " + grocery);
+        }
+    }
 
 
     //Creates grocery list
     private void populateListView() {
         String[] groceries = {"bananas", "milk", "steak", "lettuce", "chips", "bread"};
         gList = new ArrayList<String>(Arrays.asList(groceries));
+
         adapter = new ArrayAdapter<String>(this, R.layout.groceries, gList);
         ListView groceryListView = (ListView) findViewById(groceryList);
         groceryListView.setAdapter(adapter);
