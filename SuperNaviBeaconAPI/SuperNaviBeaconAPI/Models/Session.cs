@@ -153,9 +153,16 @@ namespace SuperNaviBeaconAPI.Models
 
         internal String GetDirection()
         {
+            if (travelPath.Count < 2)
+            {
+                return ("Welcome to " + supermarket.name + ". Proceed by walking forward into the store.");
+            }
+
             StringBuilder command = new StringBuilder();
 
             Point current = travelPath[travelPath.Count - 1];
+
+
 
             //if at target alert them
             if (current.X == currentTarget.X && current.Y == currentTarget.Y) {
