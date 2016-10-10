@@ -22,6 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.midas.supernavi.Models.DtoItem;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -134,22 +135,28 @@ public class ProductSelection extends AppCompatActivity {
     private void sendRequest(List<DtoItem> dtoList){
 
         String url = "http://supernavibeaconapi.azurewebsites.net/api/item";
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+        JSONArray jsArray = new JSONArray(dtoList);
+        try {
+            JSONObject jsonObject = new JSONObject().put("", jsArray);
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        //mTxtDisplay.setText("Response: " + response.toString());
-                    }
-                }, new Response.ErrorListener() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                           // List<DtoItem>  orderedDTOgList = response.;
+                        }
+                    }, new Response.ErrorListener() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO Auto-generated method stub
 
-                    }
-                });
-
+                        }
+                    });
+        }
+        catch(Exception e){
+            Log.e("Exception:",e.getMessage());
+        }
     }
 
     private List<DtoItem> sanitiseList(){
