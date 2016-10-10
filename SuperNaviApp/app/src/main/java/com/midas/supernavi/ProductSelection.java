@@ -191,9 +191,9 @@ public class ProductSelection extends AppCompatActivity {
             readShoppingList();
             return true;
         } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add"))){
-            addItem(addOrDelete[1]);
+            addItem(addOrDelete);
         } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
-            deleteItem(addOrDelete[1]);
+            deleteItem(addOrDelete);
         } else {
             tts("Sorry, I could not recognise that last command, please try again");
         }
@@ -241,8 +241,13 @@ public class ProductSelection extends AppCompatActivity {
     }
 
     //Add items to shopping list
-    private void addItem(String grocery) {
-        if (!gList.contains(grocery.toLowerCase())) {
+    private void addItem(String[] groceryStrArray) {
+        StringBuilder strBuilder = new StringBuilder();
+        for (int i = 1; i < groceryStrArray.length; i++) {
+            strBuilder.append(groceryStrArray[i]+" ");
+        }
+        String grocery = strBuilder.toString();
+        if (!gList.contains(grocery)) {
             gList.add(grocery);
             adapter.notifyDataSetChanged();
             tts("Added " + grocery + " to shopping list");
@@ -252,7 +257,12 @@ public class ProductSelection extends AppCompatActivity {
     }
 
     //Delete items from shopping list
-    private void deleteItem(String grocery) {
+    private void deleteItem(String[] groceryStrArray) {
+        StringBuilder strBuilder = new StringBuilder();
+        for (int i = 1; i < groceryStrArray.length; i++) {
+            strBuilder.append(groceryStrArray[i]+" ");
+        }
+        String grocery = strBuilder.toString();
         if (gList.contains(grocery)) {
             gList.remove(grocery);
             adapter.notifyDataSetChanged();
