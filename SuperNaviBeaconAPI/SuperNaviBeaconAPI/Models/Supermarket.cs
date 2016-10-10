@@ -18,7 +18,7 @@ namespace SuperNaviBeaconAPI.Models
 
         public Supermarket()
         {
-            SetUp();
+            
         }
 
         /**

@@ -76,6 +76,8 @@ namespace SuperNaviBeaconAPI.Controllers
                 allBeaconData = allBeaconData,
             };
 
+            supermarket.SetUp();
+
             //Getting all items from the supermarket
             List<Item> supermarketItems = new List<Item>();
             TableQuery<Item> queryItems = new TableQuery<Item>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket.name));
