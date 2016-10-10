@@ -127,7 +127,7 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
                     jsonObject.put("positionY", Integer.parseInt(yCoordinateTextField.getText().toString()));
                     jsonObject.put("rssi", beacon.getRssi());
                     jsonObject.put("supermarket", supermarketTextField.getText().toString());
-                    jsonObject.put("count", 0);
+                    jsonObject.put("count", 1);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
