@@ -44,6 +44,7 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
     private List<Beacon> currentBeaconList;
 
     private final String URL = "http://supernavibeaconapi.azurewebsites.net/api/Beacon";
+    // final String URL = "http://localhost:43865/api/Beacon";
     private RequestQueue requestQueue;
 
     @Override
@@ -115,45 +116,19 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
                        " x: " + xCoordinateTextField.getText().toString() +
                        " y: " + yCoordinateTextField.getText().toString());
 
-
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("uuid",   "A");
-                jsonObject.put("majorid", 10);
-                jsonObject.put("minorid", 5);
-                jsonObject.put("rssi",   "A");
-                jsonObject.put("positionX", 3);
-                jsonObject.put("positionY", 5);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL, jsonObject, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject jsonObject) {
-                    Log.e(TAG, "Response " + jsonObject.toString());
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError volleyError) {
-                    Log.e(TAG, "Error: " + volleyError.getMessage());
-                }
-            });
-
-            requestQueue.add(jsonRequest);
-
-
-            /*
             for(Beacon beacon : currentBeaconList){
 
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("uuid", beacon.getId1().toString());
-                    jsonObject.put("major", beacon.getId2().toInt());
-                    jsonObject.put("minor", beacon.getId3().toInt());
+                    jsonObject.put("majorid", beacon.getId2().toInt());
+                    jsonObject.put("minorid", beacon.getId3().toInt());
                     jsonObject.put("positionX", Integer.parseInt(xCoordinateTextField.getText().toString()));
                     jsonObject.put("positionY", Integer.parseInt(yCoordinateTextField.getText().toString()));
-                    jsonObject.put("rssi", Integer.toString(beacon.getRssi()));
+                    jsonObject.put("rssi", beacon.getRssi());
+                    jsonObject.put("supermarket", supermarketTextField.getText().toString());
+                    jsonObject.put("count", 0);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -169,9 +144,9 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
 
                     }
                 });
-
+                Log.d(TAG, jsonObject.toString());
                 requestQueue.add(jsonRequest);
-            }*/
+            }
 
         }
     };
