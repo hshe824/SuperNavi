@@ -61,9 +61,20 @@ namespace SuperNaviBeaconAPI.Models
         }
 
         //Use this to indicate the item was collected
-        public void collectedItem() {
+        public String collectedItem() {
+            StringBuilder command = new StringBuilder();
             groceryList.RemoveAt(0);
-            currentTarget = targets[groceryList[0]];
+            if (groceryList.Count == 0)
+            {
+                currentTarget = supermarket.exit;
+                command.Append("Now proceeding to checkout");
+            }
+            else {
+                currentTarget = targets[groceryList[0]];
+                command.Append("Now collecting " + targets[groceryList[0]]);
+            }
+
+            return command.ToString();
         }
 
         //Ordering groceries to be listed by the row, side and depth on the row
@@ -159,13 +170,14 @@ namespace SuperNaviBeaconAPI.Models
             }
 
             StringBuilder command = new StringBuilder();
-
             Point current = travelPath[travelPath.Count - 1];
 
-
+            if (current.Equals(travelPath[travelPath.Count - 2])) {
+                return "";
+            }
 
             //if at target alert them
-            if (current.X == currentTarget.X && current.Y == currentTarget.Y) {
+            if (current.Equals(currentTarget)) {
                 command.Append(groceryList[0].name + " is on the ");
                 if ((groceryList[0].side == Item.Side.LEFT && Direction == 0 ) || (groceryList[0].side == Item.Side.RIGHT && Direction == 180))
                 {
@@ -174,8 +186,7 @@ namespace SuperNaviBeaconAPI.Models
                 else {
                     command.Append("left. ");
                 }
-
-                command.Append("Then ");
+                return command.ToString();
             }
 
             calcDirection();
