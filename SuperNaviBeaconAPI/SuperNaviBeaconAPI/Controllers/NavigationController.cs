@@ -88,7 +88,7 @@ namespace SuperNaviBeaconAPI.Controllers
             {
                 name = supermarketName,
                 allBeaconData = allBeaconData,
-                exit = new Models.Point() { X = 2, Y = 0},
+                exit = new Models.Point() { X = 9, Y = 0},
             };
 
             supermarket.SetUp();
