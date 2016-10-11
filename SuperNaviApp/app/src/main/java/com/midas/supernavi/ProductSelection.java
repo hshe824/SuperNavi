@@ -115,7 +115,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
         Log.d("Mode", "Entering product selection mode");
         setTitle("SuperNavi - Product Selection");
-        tts("Entering product selection mode");
+        tts("Product selection");
 
 
     }
@@ -125,7 +125,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.NAVIGATION;
         Log.d("Mode", "Entering navigation mode");
         setTitle("SuperNavi - Navigation");
-        tts("Entering navigation mode");
+        tts("Navigation");
         List<DtoItem> dtoList = sanitiseList();
         sendRequest(dtoList);
 
@@ -174,7 +174,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.FREE_ROAM;
         Log.d("Mode", "Entering free roam mode");
         setTitle("SuperNavi - Free Roam");
-        tts("Entering free roam mode");
+        tts("free roam");
 
 
     }
@@ -236,10 +236,14 @@ public class ProductSelection extends AppCompatActivity {
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
-        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add"))){
-            addItem(addOrDelete);
-        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
-            deleteItem(addOrDelete);
+        } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
+            if (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add")) {
+                addItem(addOrDelete);
+            } else if (addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
+                deleteItem(addOrDelete);
+            }
+        } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
+            tts("Cannot add or delete in this mode, please change to product selection mode");
         } else {
             tts("Sorry, I could not recognise that last command, please try again");
         }

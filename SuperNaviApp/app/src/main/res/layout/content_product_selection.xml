@@ -45,6 +45,7 @@
         android:id="@+id/speakCommand"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:drawableRight="@mipmap/ic_launcher"
         android:layout_alignStart="@+id/groceryList" />
 
     <!--android:layout_width="wrap_content"-->
