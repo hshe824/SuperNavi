@@ -240,7 +240,7 @@ namespace SuperNaviBeaconAPI.Models
                     absDir = 270;
                 }
                 //Other wise walk to end of aisles
-                else if ((current.Y - 0) > 5)
+                else if ((current.Y) < 5)
                 {
                     absDir = 180;
                 }
