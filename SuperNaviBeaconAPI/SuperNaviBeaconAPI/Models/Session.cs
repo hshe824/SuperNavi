@@ -180,10 +180,6 @@ namespace SuperNaviBeaconAPI.Models
 
             StringBuilder command = new StringBuilder();
 
-            if (current.Equals(travelPath[travelPath.Count - 2])) {
-                return "";
-            }
-
             //if at target alert them
             if (current.Equals(currentTarget)) {
                 command.Append(groceryList[0].name + " is on the ");
@@ -201,7 +197,7 @@ namespace SuperNaviBeaconAPI.Models
             command.Append(calculatePath(current, currentTarget));
 
             if (command.ToString().Equals(prevCommand)) {
-                return "";
+                return "SAME";
             }
 
             return command.ToString();
