@@ -193,7 +193,7 @@ namespace SuperNaviBeaconAPI.Models
             Point current = travelPath[travelPath.Count - 1];
             Point prev = travelPath[travelPath.Count - 2];
 
-            if (current.equals(prev)) {
+            if (current.Equals(prev)) {
                 return;
             }
 

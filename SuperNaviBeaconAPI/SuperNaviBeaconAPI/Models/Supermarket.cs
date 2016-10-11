@@ -81,7 +81,7 @@ namespace SuperNaviBeaconAPI.Models
             Point temp = new Point() { X = x, Y = y };
             foreach (Point p in map.Keys)
             {
-                if (p.equals(temp))
+                if (p.Equals(temp))
                 {
                     return p.walkable;
                 }
