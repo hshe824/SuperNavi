@@ -81,7 +81,7 @@ namespace SuperNaviBeaconAPI.Models
 
         //Ordering groceries to be listed by the row, side and depth on the row
         private void orderGroceries() {
-            var newList = groceryList.OrderBy(c => c.positionX).ThenBy(c => c.side).ThenBy(c => c.positionY);
+            var newList = groceryList.OrderBy(c => c.positionX).ThenByDescending(c => c.side).ThenBy(c => c.positionY);
             groceryList = newList.ToList();
         }
 
@@ -89,7 +89,7 @@ namespace SuperNaviBeaconAPI.Models
         private void generateTargetPoints() {
             foreach(Item item in groceryList) {
                 int offset = 1;
-                if (item.side == Item.Side.LEFT) {
+                if (item.side.ToLower().Equals("left")) {
                     offset = -1;
                 }
                 Point temp = new Point()
@@ -184,7 +184,7 @@ namespace SuperNaviBeaconAPI.Models
             //if at target alert them
             if (current.Equals(currentTarget)) {
                 command.Append(groceryList[0].name + " is on the ");
-                if ((groceryList[0].side == Item.Side.LEFT && Direction == 0 ) || (groceryList[0].side == Item.Side.RIGHT && Direction == 180))
+                if ((groceryList[0].side.ToLower().Equals("left") && Direction == 0 ) || (groceryList[0].side.ToLower().Equals("right") && Direction == 180))
                 {
                     command.Append("right. SIGNATURE");
                 }
