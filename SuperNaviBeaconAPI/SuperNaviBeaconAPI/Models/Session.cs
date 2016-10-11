@@ -174,7 +174,7 @@ namespace SuperNaviBeaconAPI.Models
             Point current = travelPath[travelPath.Count - 1];
 
             //If target is the exit, thank user for using app
-            if (shoppingComplete && current.Equals(currentTarget) {
+            if (shoppingComplete && current.Equals(currentTarget)) {
                 return ("Thank you for using SuperNavi! Hope you enjoyed this service.");
             }
 
@@ -283,6 +283,5 @@ namespace SuperNaviBeaconAPI.Models
             relativeDirectionMap.Add(-180, "Turn Around.");
             relativeDirectionMap.Add(-270, "Turn Right.");
         }
-
     }
 }
