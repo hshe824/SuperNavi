@@ -35,6 +35,18 @@ namespace SuperNaviBeaconAPI.Controllers
             return "value";
         }
 
+        // GET api/Navigation/retrieved
+        [Route("api/navigation/retrieved/{phoneID}")]
+        [HttpGet]
+        public IHttpActionResult RetrievedItem(String phoneID)
+        {
+            Session session = connections[phoneID];
+
+            session.collectedItem();
+
+            return Ok();
+        }
+
         //Post api/Navigation
         [Route("~/api/navigation/")]
         public String Post(DtoBeacon beacon)
