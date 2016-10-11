@@ -80,7 +80,7 @@ namespace SuperNaviBeaconAPI.Models
 
         //Ordering groceries to be listed by the row, side and depth on the row
         private void orderGroceries() {
-            var newList = groceryList.OrderBy(c => c.positionY).ThenBy(c => c.side).ThenBy(c => c.positionX);
+            var newList = groceryList.OrderBy(c => c.positionX).ThenBy(c => c.side).ThenBy(c => c.positionY);
             groceryList = newList.ToList();
         }
 
