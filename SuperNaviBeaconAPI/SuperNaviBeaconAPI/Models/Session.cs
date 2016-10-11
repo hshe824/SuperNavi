@@ -22,7 +22,7 @@ namespace SuperNaviBeaconAPI.Models
         //Mapping targets to points
         public Dictionary<Item, Point> targets = new Dictionary<Item, Point>();
         public Point currentTarget = new Point();
-
+        public Boolean shoppingComplete = false;
         //List of grocery items from the user
         private List<Item> groceryList = new List<Item>();
         //List of all grocery items
@@ -61,9 +61,21 @@ namespace SuperNaviBeaconAPI.Models
         }
 
         //Use this to indicate the item was collected
-        public void collectedItem() {
+        public String collectedItem() {
+            StringBuilder command = new StringBuilder();
             groceryList.RemoveAt(0);
-            currentTarget = targets[groceryList[0]];
+            if (groceryList.Count == 0)
+            {
+                currentTarget = supermarket.exit;
+                command.Append("Now proceeding to checkout");
+                shoppingComplete = true;
+            }
+            else {
+                currentTarget = targets[groceryList[0]];
+                command.Append("Now collecting " + targets[groceryList[0]]);
+            }
+
+            return command.ToString();
         }
 
         //Ordering groceries to be listed by the row, side and depth on the row
@@ -153,29 +165,36 @@ namespace SuperNaviBeaconAPI.Models
 
         internal String GetDirection()
         {
+            //must be first poll, get user to walk to right
             if (travelPath.Count < 2)
             {
                 return ("Welcome to " + supermarket.name + ". Proceed by walking to the right.");
             }
 
-            StringBuilder command = new StringBuilder();
-
             Point current = travelPath[travelPath.Count - 1];
 
+            //If target is the exit, thank user for using app
+            if (shoppingComplete && current.Equals(currentTarget) {
+                return ("Thank you for using SuperNavi! Hope you enjoyed this service.");
+            }
 
+            StringBuilder command = new StringBuilder();
+
+            if (current.Equals(travelPath[travelPath.Count - 2])) {
+                return "";
+            }
 
             //if at target alert them
-            if (current.X == currentTarget.X && current.Y == currentTarget.Y) {
+            if (current.Equals(currentTarget)) {
                 command.Append(groceryList[0].name + " is on the ");
                 if ((groceryList[0].side == Item.Side.LEFT && Direction == 0 ) || (groceryList[0].side == Item.Side.RIGHT && Direction == 180))
                 {
-                    command.Append("right. ");
+                    command.Append("right. SIGNATURE");
                 }
                 else {
-                    command.Append("left. ");
+                    command.Append("left.SIGNATURE");
                 }
-
-                command.Append("Then ");
+                return command.ToString();
             }
 
             calcDirection();

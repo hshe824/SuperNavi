@@ -38,13 +38,13 @@ namespace SuperNaviBeaconAPI.Controllers
         // GET api/Navigation/retrieved
         [Route("api/navigation/retrieved/{phoneID}")]
         [HttpGet]
-        public IHttpActionResult RetrievedItem(String phoneID)
+        public String RetrievedItem(String phoneID)
         {
             Session session = connections[phoneID];
 
-            session.collectedItem();
+            String command = session.collectedItem();
 
-            return Ok();
+            return command;
         }
 
         //Post api/Navigation
@@ -88,6 +88,7 @@ namespace SuperNaviBeaconAPI.Controllers
             {
                 name = supermarketName,
                 allBeaconData = allBeaconData,
+                exit = new Models.Point() { X = 9, Y = 0},
             };
 
             supermarket.SetUp();

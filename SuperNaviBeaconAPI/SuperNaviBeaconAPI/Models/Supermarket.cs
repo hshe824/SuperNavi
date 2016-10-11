@@ -10,16 +10,16 @@ namespace SuperNaviBeaconAPI.Models
         public String name { get; set; }
         public List<Beacon> allBeaconData { get; set; }
 
+        public Point exit { get; set; }
+        public Point entry { get; set; }
+
         /**
             Key: Point with X and Y
             Value: List of all beacon data for that Point
         */
         private Dictionary<Point, List<Beacon>> map = new Dictionary<Point, List<Beacon>>();
 
-        public Supermarket()
-        {
-            
-        }
+        public Supermarket() {}
 
         /**
             Setup all the points and the beacon data into the dictionary
