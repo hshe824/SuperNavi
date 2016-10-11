@@ -180,7 +180,7 @@ namespace SuperNaviBeaconAPI.Models
             }
 
             StringBuilder command = new StringBuilder();
-
+            calcDirection();
             //if at target alert them
             if (current.Equals(currentTarget)) {
                 command.Append(groceryList[0].name + " is on the ");
@@ -194,7 +194,7 @@ namespace SuperNaviBeaconAPI.Models
                 return command.ToString();
             }
 
-            calcDirection();
+
             command.Append(calculatePath(current, currentTarget));
 
             if (command.ToString().Equals(prevCommand)) {
