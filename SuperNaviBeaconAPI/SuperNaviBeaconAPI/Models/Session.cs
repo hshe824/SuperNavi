@@ -193,7 +193,7 @@ namespace SuperNaviBeaconAPI.Models
             Point current = travelPath[travelPath.Count - 1];
             Point prev = travelPath[travelPath.Count - 2];
 
-            if (current.X == prev.X && current.Y == prev.Y) {
+            if (current.equals(prev)) {
                 return;
             }
 
@@ -228,28 +228,28 @@ namespace SuperNaviBeaconAPI.Models
                     absDir = 0;
                 }
             }
-            //Other wise walk to end of aisles
-            else if ((current.Y != 0 || current.Y != 10))
+            else
             {
-                if ((current.Y - 0) > 5)
-                {
-                    absDir = 180;
-                }
-                else {
-                    absDir = 0;
-                }
-            }
-            //else walk to correct aisle
-            else {
-                if (current.X < currentTarget.X)
+                //walk left or right if no obstacle in the way
+                if (current.X < currentTarget.X && supermarket.isWalkable(current.X + 1, current.Y))
                 {
                     absDir = 90;
                 }
-                else {
+                else if (current.X > currentTarget.X && supermarket.isWalkable(current.X - 1, current.Y))
+                {
                     absDir = 270;
                 }
+                //Other wise walk to end of aisles
+                else if ((current.Y - 0) > 5)
+                {
+                    absDir = 180;
+                }
+                else
+                {
+                    absDir = 0;
+                }
             }
-
+           
             String command = relativeDirectionMap[(absDir - Direction)];
             return command;
         }
