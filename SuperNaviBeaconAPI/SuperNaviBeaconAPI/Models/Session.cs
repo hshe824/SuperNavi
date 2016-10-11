@@ -155,7 +155,7 @@ namespace SuperNaviBeaconAPI.Models
         {
             if (travelPath.Count < 2)
             {
-                return ("Welcome to " + supermarket.name + ". Proceed by walking forward into the store.");
+                return ("Welcome to " + supermarket.name + ". Proceed by walking to the right.");
             }
 
             StringBuilder command = new StringBuilder();
@@ -229,7 +229,7 @@ namespace SuperNaviBeaconAPI.Models
                 }
             }
             //Other wise walk to end of aisles
-            else if (current.Y != 0 || current.Y != 10)
+            else if ((current.Y != 0 || current.Y != 10))
             {
                 if ((current.Y - 0) > 5)
                 {
