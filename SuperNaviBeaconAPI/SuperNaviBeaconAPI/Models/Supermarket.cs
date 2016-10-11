@@ -75,5 +75,18 @@ namespace SuperNaviBeaconAPI.Models
                 Y = y,
             }];
         }
+
+        public Boolean isWalkable(int x, int y)
+        {
+            Point temp = new Point() { X = x, Y = y };
+            foreach (Point p in map.Keys)
+            {
+                if (p.equals(temp))
+                {
+                    return p.walkable;
+                }
+            }
+            return false;
+        }
     }
 }
