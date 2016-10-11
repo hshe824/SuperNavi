@@ -28,4 +28,9 @@ namespace SuperNaviBeaconAPI.Models
             return item;
         }
     }
+
+    public class DtoItemList
+    {
+        public List<DtoItem> shoppingList { get; set; }
+    }
 }

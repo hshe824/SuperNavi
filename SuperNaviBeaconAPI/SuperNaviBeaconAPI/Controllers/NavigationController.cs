@@ -36,6 +36,7 @@ namespace SuperNaviBeaconAPI.Controllers
         }
 
         //Post api/Navigation
+        [Route("~/api/navigation/")]
         public String Post(DtoBeacon beacon)
         {
             //Get the name of the supermarket with one of the beacons
@@ -59,7 +60,8 @@ namespace SuperNaviBeaconAPI.Controllers
             Pass in the items that needs to be picked up as well as the supermarket name
             Session is created
         */
-        public HttpStatusCode Post(List<DtoItem> items, String supermarketName, String phoneID)
+        [Route("~/api/navigation/{supermarketName}/{phoneID}")]
+        public HttpStatusCode Post(DtoItemList list, String supermarketName, String phoneID)
         {
             //Get IP Address
             String ipAddress = phoneID;
@@ -84,7 +86,7 @@ namespace SuperNaviBeaconAPI.Controllers
             foreach (Item item in itemTable.ExecuteQuery(queryItems)) {supermarketItems.Add(item);}
 
             //Make the session
-            Session session = new Session(items, supermarket, supermarketItems);
+            Session session = new Session(list.shoppingList, supermarket, supermarketItems);
             
             //Store the session
             connections[ipAddress] = session;
@@ -96,14 +98,15 @@ namespace SuperNaviBeaconAPI.Controllers
         /*
             Get the direction given the current position
         */
-        public String Post(List<DtoBeacon> beacons, String phoneID)
+        [Route("~/api/navigation/{phoneID}")]
+        public String Post(DtoBeaconList list, String phoneID)
         {
             String ipAddress = phoneID;
             //Retrieve session with IP Address
             Session session = connections[ipAddress];
             
             //Update position with the new client beacon data
-            session.UpdateNewPosition(beacons);
+            session.UpdateNewPosition(list.beacons);
 
             //Get direction to go to
             /*
@@ -119,9 +122,18 @@ namespace SuperNaviBeaconAPI.Controllers
         {
         }
 
-        // DELETE api/Navigation/5
-        public void Delete(int id)
+        // DELETE api/Navigation/
+        [HttpDelete]
+        public void Delete()
         {
+        }
+
+        // DELETE api/Navigation/reset
+        [HttpDelete]
+        [Route("api/navigation/reset")]
+        public void Reset()
+        {
+            connections.Clear();
         }
     }
 }
