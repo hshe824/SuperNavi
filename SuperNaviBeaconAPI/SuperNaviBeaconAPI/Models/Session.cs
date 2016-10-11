@@ -67,14 +67,15 @@ namespace SuperNaviBeaconAPI.Models
             if (groceryList.Count == 0)
             {
                 currentTarget = supermarket.exit;
-                command.Append("Now proceeding to checkout");
+                command.Append("Now proceeding to checkout.");
                 shoppingComplete = true;
             }
             else {
                 currentTarget = targets[groceryList[0]];
-                command.Append("Now collecting " + targets[groceryList[0]]);
+                command.Append("Now collecting " + groceryList[0].name);                
+                //ADD NEXT DIRECTION
             }
-
+            command.Append(calculatePath(travelPath[travelPath.Count - 1], currentTarget));
             return command.ToString();
         }
 
@@ -275,9 +276,9 @@ namespace SuperNaviBeaconAPI.Models
             relativeDirectionMap.Add(180, "Turn Around.");
             relativeDirectionMap.Add(270, "Turn Right.");
             relativeDirectionMap.Add(360, "Keep Going Straight.");
-            relativeDirectionMap.Add(-90, "Turn Left.");
+            relativeDirectionMap.Add(-90, "Turn Right.");
             relativeDirectionMap.Add(-180, "Turn Around.");
-            relativeDirectionMap.Add(-270, "Turn Right.");
+            relativeDirectionMap.Add(-270, "Turn Left.");
         }
     }
 }
