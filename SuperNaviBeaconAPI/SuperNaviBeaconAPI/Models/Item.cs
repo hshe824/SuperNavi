@@ -35,7 +35,7 @@ namespace SuperNaviBeaconAPI.Models
                 supermarket = this.supermarket,
                 positionX = this.positionX,
                 positionY = this.positionY,
-                side = this.side.ToString(),
+                side = this.side,
             };
         }
     }
