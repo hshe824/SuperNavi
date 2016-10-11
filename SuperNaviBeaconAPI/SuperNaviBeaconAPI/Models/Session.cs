@@ -272,13 +272,13 @@ namespace SuperNaviBeaconAPI.Models
 
         private void populateRelativeMap() {
             relativeDirectionMap.Add(0, "Keep Going Straight.");
-            relativeDirectionMap.Add(90, "Turn Left.");
+            relativeDirectionMap.Add(90, "Turn Right.");
             relativeDirectionMap.Add(180, "Turn Around.");
-            relativeDirectionMap.Add(270, "Turn Right.");
+            relativeDirectionMap.Add(270, "Turn Left.");
             relativeDirectionMap.Add(360, "Keep Going Straight.");
-            relativeDirectionMap.Add(-90, "Turn Right.");
+            relativeDirectionMap.Add(-90, "Turn Left.");
             relativeDirectionMap.Add(-180, "Turn Around.");
-            relativeDirectionMap.Add(-270, "Turn Left.");
+            relativeDirectionMap.Add(-270, "Turn Right.");
         }
     }
 }
