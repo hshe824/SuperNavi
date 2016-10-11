@@ -181,7 +181,7 @@ namespace SuperNaviBeaconAPI.Models
             StringBuilder command = new StringBuilder();
 
             if (current.Equals(travelPath[travelPath.Count - 2])) {
-                return "";
+                return "SAME";
             }
 
             //if at target alert them
