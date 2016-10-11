@@ -22,7 +22,7 @@ namespace SuperNaviBeaconAPI.Models
         //Mapping targets to points
         public Dictionary<Item, Point> targets = new Dictionary<Item, Point>();
         public Point currentTarget = new Point();
-
+        public Boolean shoppingComplete = false;
         //List of grocery items from the user
         private List<Item> groceryList = new List<Item>();
         //List of all grocery items
@@ -68,6 +68,7 @@ namespace SuperNaviBeaconAPI.Models
             {
                 currentTarget = supermarket.exit;
                 command.Append("Now proceeding to checkout");
+                shoppingComplete = true;
             }
             else {
                 currentTarget = targets[groceryList[0]];
@@ -164,13 +165,20 @@ namespace SuperNaviBeaconAPI.Models
 
         internal String GetDirection()
         {
+            //must be first poll, get user to walk to right
             if (travelPath.Count < 2)
             {
                 return ("Welcome to " + supermarket.name + ". Proceed by walking to the right.");
             }
 
-            StringBuilder command = new StringBuilder();
             Point current = travelPath[travelPath.Count - 1];
+
+            //If target is the exit, thank user for using app
+            if (shoppingComplete && current.Equals(currentTarget) {
+                return ("Thank you for using SuperNavi! Hope you enjoyed this service.");
+            }
+
+            StringBuilder command = new StringBuilder();
 
             if (current.Equals(travelPath[travelPath.Count - 2])) {
                 return "";
@@ -181,10 +189,10 @@ namespace SuperNaviBeaconAPI.Models
                 command.Append(groceryList[0].name + " is on the ");
                 if ((groceryList[0].side == Item.Side.LEFT && Direction == 0 ) || (groceryList[0].side == Item.Side.RIGHT && Direction == 180))
                 {
-                    command.Append("right. ");
+                    command.Append("right. SIGNATURE");
                 }
                 else {
-                    command.Append("left. ");
+                    command.Append("left.SIGNATURE");
                 }
                 return command.ToString();
             }
