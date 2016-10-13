@@ -105,7 +105,7 @@ public class ProductSelection extends AppCompatActivity {
             }
         });
         textToSpeech.setSpeechRate((float) 0.85);
-        textToSpeech.speak("Press speak button on the bottom of the screen and say an item to add it to the shopping list", TextToSpeech.QUEUE_FLUSH, null, null);
+        tts("Press speak button on the bottom of the screen and say an item to add it to the shopping list");
 
 
     }
@@ -115,7 +115,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
         Log.d("Mode", "Entering product selection mode");
         setTitle("SuperNavi - Product Selection");
-        tts("Product selection");
+        tts("Product selection",true);
 
 
     }
@@ -125,7 +125,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.NAVIGATION;
         Log.d("Mode", "Entering navigation mode");
         setTitle("SuperNavi - Navigation");
-        tts("Navigation");
+        tts("Navigation",true);
         List<DtoItem> dtoList = sanitiseList();
         sendRequest(dtoList);
 
@@ -174,7 +174,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.FREE_ROAM;
         Log.d("Mode", "Entering free roam mode");
         setTitle("SuperNavi - Free Roam");
-        tts("free roam");
+        tts("free roam",true);
 
 
     }
@@ -289,6 +289,12 @@ public class ProductSelection extends AppCompatActivity {
             Log.e("Exception:",e.getMessage());
         }
     }
+
+    //Interruptible tts overloaded method
+    private void tts(String toSpeak, boolean interruptible) {
+        textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
+    }
+
 
     //Add items to shopping list
     private void addItem(String[] groceryStrArray) {
