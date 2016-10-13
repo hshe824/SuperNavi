@@ -105,9 +105,6 @@ public class ProductSelection extends AppCompatActivity {
             }
         });
         textToSpeech.setSpeechRate((float) 0.85);
-        tts("Press speak button on the bottom of the screen and say an item to add it to the shopping list");
-
-
     }
 
     //Handles product selection mode
@@ -115,7 +112,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
         Log.d("Mode", "Entering product selection mode");
         setTitle("SuperNavi - Product Selection");
-        tts("Product selection",true);
+        tts("Product selection mode", true);
 
 
     }
@@ -125,14 +122,14 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.NAVIGATION;
         Log.d("Mode", "Entering navigation mode");
         setTitle("SuperNavi - Navigation");
-        tts("Navigation",true);
+        tts("Navigation mode", true);
         List<DtoItem> dtoList = sanitiseList();
         sendRequest(dtoList);
 
 
     }
 
-    private void sendRequest(List<DtoItem> dtoList){
+    private void sendRequest(List<DtoItem> dtoList) {
 
         String url = "http://supernavibeaconapi.azurewebsites.net/api/item";
         JSONArray jsArray = new JSONArray(dtoList);
@@ -143,7 +140,7 @@ public class ProductSelection extends AppCompatActivity {
 
                         @Override
                         public void onResponse(JSONObject response) {
-                           // List<DtoItem>  orderedDTOgList = response.;
+                            // List<DtoItem>  orderedDTOgList = response.;
                         }
                     }, new Response.ErrorListener() {
 
@@ -153,15 +150,14 @@ public class ProductSelection extends AppCompatActivity {
 
                         }
                     });
-        }
-        catch(Exception e){
-            Log.e("Exception:",e.getMessage());
+        } catch (Exception e) {
+            Log.e("Exception:", e.getMessage());
         }
     }
 
-    private List<DtoItem> sanitiseList(){
+    private List<DtoItem> sanitiseList() {
         ArrayList<DtoItem> dtoList = new ArrayList<DtoItem>();
-        for (String item: gList){
+        for (String item : gList) {
             DtoItem dtoItem = new DtoItem(item);
             dtoList.add(dtoItem);
         }
@@ -174,7 +170,7 @@ public class ProductSelection extends AppCompatActivity {
         currentOperatingMode = OperatingMode.FREE_ROAM;
         Log.d("Mode", "Entering free roam mode");
         setTitle("SuperNavi - Free Roam");
-        tts("free roam",true);
+        tts("free roam mode", true);
 
 
     }
@@ -236,13 +232,15 @@ public class ProductSelection extends AppCompatActivity {
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
+        } else if (matches.contains("clear shopping list")){
+          //  clearShoppingList();
         } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
             if (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add")) {
                 addItem(addOrDelete);
             } else if (addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
                 deleteItem(addOrDelete);
             }
-        } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")){
+        } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
             tts("Cannot add or delete in this mode, please change to product selection mode");
         } else {
             tts("Sorry, I could not recognise that last command, please try again");
@@ -251,6 +249,10 @@ public class ProductSelection extends AppCompatActivity {
         return false;
     }
 
+//    private void clearShoppingList(){
+//            gList = new ArrayList<String>();
+//            adapter.notifyDataSetChanged();
+//    }
     private void readShoppingList() {
         tts("Your shopping list contains:");
         Log.v("Grocery list:", gList.toString());
@@ -278,17 +280,33 @@ public class ProductSelection extends AppCompatActivity {
 
     }
 
-    private void tts(String toSpeak) {
-        textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
-        while (textToSpeech.isSpeaking()) {
+    private void tts(final String toSpeak) {
+        Thread t1 = new Thread() {
 
-        }
+            @Override
+            public void run() {
+                textToSpeech.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
+                while (textToSpeech.isSpeaking()) {
+                }
+                try {
+                    Thread.sleep(300);
+                } catch (
+                        InterruptedException e
+                        ) {
+                    Log.e("Exception:", e.getMessage());
+                }
+
+            }
+
+            ;
+        };
+        t1.start();
         try {
-            Thread.sleep(300);
-        } catch (InterruptedException e){
-            Log.e("Exception:",e.getMessage());
+            t1.join();
+        } catch (InterruptedException e) {
         }
     }
+
 
     //Interruptible tts overloaded method
     private void tts(String toSpeak, boolean interruptible) {
@@ -300,7 +318,7 @@ public class ProductSelection extends AppCompatActivity {
     private void addItem(String[] groceryStrArray) {
         StringBuilder strBuilder = new StringBuilder();
         for (int i = 1; i < groceryStrArray.length; i++) {
-            strBuilder.append(groceryStrArray[i]+" ");
+            strBuilder.append(groceryStrArray[i] + " ");
         }
         String grocery = strBuilder.toString().trim();
         if (!gList.contains(grocery)) {
@@ -316,7 +334,7 @@ public class ProductSelection extends AppCompatActivity {
     private void deleteItem(String[] groceryStrArray) {
         StringBuilder strBuilder = new StringBuilder();
         for (int i = 1; i < groceryStrArray.length; i++) {
-            strBuilder.append(groceryStrArray[i]+" ");
+            strBuilder.append(groceryStrArray[i] + " ");
         }
         String grocery = strBuilder.toString().trim();
         Log.d("Deleted:", grocery);
@@ -332,7 +350,7 @@ public class ProductSelection extends AppCompatActivity {
 
     //Creates grocery list
     private void populateListView() {
-        String[] groceries = {"bananas", "milk", "steak", "lettuce", "chips", "bread"};
+        String[] groceries = {"milk", "bread"};
         gList = new ArrayList<String>(Arrays.asList(groceries));
 
         adapter = new ArrayAdapter<String>(this, R.layout.groceries, gList);
