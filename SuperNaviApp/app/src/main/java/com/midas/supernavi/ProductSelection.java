@@ -3,10 +3,13 @@ package com.midas.supernavi;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.provider.Settings.Secure;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,33 +24,44 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.midas.supernavi.Models.DtoItem;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.BeaconConsumer;
+import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.RangeNotifier;
+import org.altbeacon.beacon.Region;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
 import static com.midas.supernavi.R.id.groceryList;
 
 
-public class ProductSelection extends AppCompatActivity {
+public class ProductSelection extends AppCompatActivity implements BeaconConsumer{
 
     private VerticalSeekBar modeSelector;
     private OperatingMode currentOperatingMode;
     private TextToSpeech textToSpeech;
     private List<String> gList;
     private ArrayAdapter<String> adapter;
+    private BeaconManager beaconManager;
+    private RequestQueue requestQueue;
+    private List<Beacon> currentBeaconList;
 
     private static final int SPEECH_REQUEST_CODE = 0;
-
 
     enum OperatingMode {
         PRODUCT_SELECTION,
@@ -110,6 +124,53 @@ public class ProductSelection extends AppCompatActivity {
             }
         });
         textToSpeech.setSpeechRate((float) 0.85);
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.BLUETOOTH);
+
+        int permissionAdminCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.BLUETOOTH_ADMIN);
+
+        int permissionCoarseLocationCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        int permissionFineLocationCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+
+        Log.d("", "Bluetooth: " + permissionAdminCheck);
+        Log.d("", "Bluetooth Admin: " + permissionAdminCheck);
+
+        if(permissionCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH},
+                    0);
+        }
+
+        if(permissionAdminCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH_ADMIN},
+                    0);
+        }
+
+        if(permissionCoarseLocationCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    0);
+        }
+
+        if(permissionFineLocationCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+        }
+
+        beaconManager = BeaconManager.getInstanceForApplication(getApplicationContext());
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        beaconManager.setForegroundBetweenScanPeriod(0l);
+        beaconManager.setForegroundScanPeriod(5000l);
+        beaconManager.bind(this);
+
+        requestQueue = Volley.newRequestQueue(this);
     }
 
     //Handles product selection mode
@@ -136,9 +197,6 @@ public class ProductSelection extends AppCompatActivity {
     }
 
     private void sendRequest(List<DtoItem> dtoList) {
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-
         String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
                 Secure.ANDROID_ID);
 
@@ -163,6 +221,7 @@ public class ProductSelection extends AppCompatActivity {
 
                         }
                     });
+            requestQueue.add(jsObjRequest);
         } catch (Exception e) {
             Log.e("Exception:", e.getMessage());
         }
@@ -392,5 +451,23 @@ public class ProductSelection extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBeaconServiceConnect() {
+        beaconManager.setRangeNotifier(new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
+                Log.d("", "Count: " + collection.size());
+
+                currentBeaconList = new ArrayList<>(collection);
+            }
+        });
+
+        try{
+            beaconManager.startRangingBeaconsInRegion(new Region("defaultRegion", null, null, null));
+        }catch(RemoteException e){
+
+        }
     }
 }
