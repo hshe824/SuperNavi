@@ -43,8 +43,8 @@ namespace SuperNaviBeaconAPI.Controllers
             Pass in the items that needs to be picked up as well as the supermarket name
             Session is created
         */
-        [Route("~/api/navigation/{supermarketName}/{phoneID}")]
-        public HttpStatusCode Post(DtoItemList list, DtoBeacon beacon, String phoneID)
+        [Route("~/api/navigation/{phoneID}")]
+        public HttpStatusCode Post(DtoItemList list, String phoneID)
         {
             String supermarketName = "";
 
@@ -52,9 +52,9 @@ namespace SuperNaviBeaconAPI.Controllers
             TableQuery<Beacon> supermarketQuery = new TableQuery<Beacon>();
             foreach (Beacon entity in beaconTable.ExecuteQuery(supermarketQuery))
             {
-                if (entity.majorid == beacon.majorid &&
-                   entity.minorid == beacon.minorid &&
-                   entity.uuid == beacon.uuid)
+                if (entity.majorid == list.beacon.majorid &&
+                   entity.minorid == list.beacon.minorid &&
+                   entity.uuid == list.beacon.uuid)
                 {
                     supermarketName = entity.supermarket;
                 }

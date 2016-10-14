@@ -32,5 +32,6 @@ namespace SuperNaviBeaconAPI.Models
     public class DtoItemList
     {
         public List<DtoItem> shoppingList { get; set; }
+        public DtoBeacon beacon { get; set; }
     }
 }
