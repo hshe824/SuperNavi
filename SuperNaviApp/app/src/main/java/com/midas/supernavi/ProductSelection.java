@@ -1,11 +1,16 @@
 package com.midas.supernavi;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -125,16 +130,24 @@ public class ProductSelection extends AppCompatActivity {
         tts("Navigation mode", true);
         List<DtoItem> dtoList = sanitiseList();
         sendRequest(dtoList);
+        Log.d("Grocery list posted:",dtoList.toString());
 
 
     }
 
     private void sendRequest(List<DtoItem> dtoList) {
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
-        String url = "http://supernavibeaconapi.azurewebsites.net/api/item";
+        String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
+                Secure.ANDROID_ID);
+
+        Log.d("AndroidID",android_id);
+
+        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/test1/"+android_id;
         JSONArray jsArray = new JSONArray(dtoList);
         try {
-            JSONObject jsonObject = new JSONObject().put("", jsArray);
+            JSONObject jsonObject = new JSONObject().put("shoppingList", jsArray);
             JsonObjectRequest jsObjRequest = new JsonObjectRequest
                     (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
 
