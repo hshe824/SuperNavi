@@ -23,17 +23,6 @@ namespace SuperNaviBeaconAPI.Controllers
         private CloudTable itemTable = CloudStorageAccount.Parse(
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Item");
 
-        // GET api/Navigation
-        public IEnumerable<string> Get()
-        {
-            return new string[] {};
-        }
-
-        // GET api/Navigation/5
-        public string Get(DtoBeacon beacon)
-        {
-            return "value";
-        }
 
         // GET api/Navigation/retrieved
         [Route("api/navigation/retrieved/{phoneID}")]
@@ -47,24 +36,6 @@ namespace SuperNaviBeaconAPI.Controllers
             return command;
         }
 
-        //Post api/Navigation
-        [Route("~/api/navigation/")]
-        public String Post(DtoBeacon beacon)
-        {
-            //Get the name of the supermarket with one of the beacons
-            TableQuery<Beacon> query = new TableQuery<Beacon>();
-            foreach(Beacon entity in beaconTable.ExecuteQuery(query))
-            {
-                if(entity.majorid == beacon.majorid &&
-                   entity.minorid == beacon.minorid &&
-                   entity.uuid == beacon.uuid)
-                {
-                    return entity.supermarket;
-                }
-            }
-            return "Supermarket not found";
-        }
-
         //POST api.Navigation
         /*
             Initialise the navigation
@@ -73,8 +44,22 @@ namespace SuperNaviBeaconAPI.Controllers
             Session is created
         */
         [Route("~/api/navigation/{supermarketName}/{phoneID}")]
-        public HttpStatusCode Post(DtoItemList list, String supermarketName, String phoneID)
+        public HttpStatusCode Post(DtoItemList list, DtoBeacon beacon, String phoneID)
         {
+            String supermarketName = "";
+
+            //Get the name of the supermarket with one of the beacons
+            TableQuery<Beacon> supermarketQuery = new TableQuery<Beacon>();
+            foreach (Beacon entity in beaconTable.ExecuteQuery(supermarketQuery))
+            {
+                if (entity.majorid == beacon.majorid &&
+                   entity.minorid == beacon.minorid &&
+                   entity.uuid == beacon.uuid)
+                {
+                    supermarketName = entity.supermarket;
+                }
+            }
+
             //Get IP Address
             String ipAddress = phoneID;
 
@@ -128,17 +113,6 @@ namespace SuperNaviBeaconAPI.Controllers
                     Right
             */
             return session.GetDirection();
-        }
-
-        // PUT api/Navigation/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/Navigation/
-        [HttpDelete]
-        public void Delete()
-        {
         }
 
         // DELETE api/Navigation/reset
