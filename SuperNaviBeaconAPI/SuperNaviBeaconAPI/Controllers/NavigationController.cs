@@ -43,7 +43,7 @@ namespace SuperNaviBeaconAPI.Controllers
             Pass in the items that needs to be picked up as well as the supermarket name
             Session is created
         */
-        [Route("~/api/navigation/{phoneID}")]
+        [Route("~/api/navigation/item/{phoneID}")]
         public HttpStatusCode Post(DtoItemList list, String phoneID)
         {
             String supermarketName = "";
