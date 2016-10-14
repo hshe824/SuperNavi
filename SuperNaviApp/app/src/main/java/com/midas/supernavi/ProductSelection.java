@@ -1,7 +1,6 @@
 package com.midas.supernavi;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
+import com.midas.supernavi.Models.DtoBeacon;
 import com.midas.supernavi.Models.DtoItem;
 
 import org.altbeacon.beacon.Beacon;
@@ -202,10 +201,19 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         Log.d("AndroidID",android_id);
 
-        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/test1/"+android_id;
+        if(currentBeaconList.size() == 0){
+            Log.d("", "No beacons found");
+            return;
+        }
+
+        Log.d("", "" + dtoList.size());
+
+        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/item/"+android_id;
         JSONArray jsArray = new JSONArray(dtoList);
         try {
-            JSONObject jsonObject = new JSONObject().put("shoppingList", jsArray);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("shoppingList", dtoList);
+            jsonObject.put("beacon", new DtoBeacon(currentBeaconList.get(0)));
             JsonObjectRequest jsObjRequest = new JsonObjectRequest
                     (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
 
@@ -221,6 +229,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
                         }
                     });
+            Log.d("", jsonObject.toString());
             requestQueue.add(jsObjRequest);
         } catch (Exception e) {
             Log.e("Exception:", e.getMessage());
