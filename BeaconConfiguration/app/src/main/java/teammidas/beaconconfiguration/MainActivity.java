@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -24,6 +26,7 @@ import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.service.RangedBeacon;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
     private EditText supermarketTextField;
     private EditText xCoordinateTextField;
     private EditText yCoordinateTextField;
+    private TextView beaconInfoTextField;
     private BeaconManager beaconManager;
     private List<Beacon> currentBeaconList;
 
@@ -56,13 +60,14 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
         supermarketTextField = (EditText) findViewById(R.id.editText4);
         xCoordinateTextField = (EditText) findViewById(R.id.editText3);
         yCoordinateTextField = (EditText) findViewById(R.id.editText2);
-
+        beaconInfoTextField = (TextView) findViewById(R.id.textView2);
         sendButton.setOnClickListener(buttonHandler);
 
         beaconManager = BeaconManager.getInstanceForApplication(getApplicationContext());
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.setForegroundBetweenScanPeriod(0l);
-        beaconManager.setForegroundScanPeriod(5000l);
+        beaconManager.setForegroundScanPeriod(10000l);
+        RangedBeacon.setSampleExpirationMilliseconds(30000l);
         beaconManager.bind(this);
 
 
@@ -148,6 +153,19 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
                 requestQueue.add(jsonRequest);
             }
 
+            final int x = Integer.parseInt(xCoordinateTextField.getText().toString());
+            final int y = Integer.parseInt(yCoordinateTextField.getText().toString());
+
+            if(x < 4){
+                xCoordinateTextField.setText("" + (x+1));
+                return;
+            }
+            else if(x == 4){
+                xCoordinateTextField.setText("" + 0);
+                yCoordinateTextField.setText("" + (y+1));
+                return;
+            }
+
         }
     };
 
@@ -160,6 +178,19 @@ MainActivity extends AppCompatActivity implements BeaconConsumer {
                 Log.d(TAG, "Count: " + collection.size());
 
                 currentBeaconList = new ArrayList<>(collection);
+                final StringBuilder infoBuilder = new StringBuilder();
+                for(Beacon beacon : currentBeaconList){
+                    Log.d(TAG, "MajorID: " + beacon.getId2().toString() + " MinorID: " + beacon.getId3().toString() + " RSSI: " + beacon.getRssi());
+                    infoBuilder.append("MajorID: " + beacon.getId2().toString() + " RSSI: " + beacon.getRssi() + "\n");
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        beaconInfoTextField.setText(infoBuilder.toString());
+                    }
+                });
+                Log.d(TAG, "---------------------------------------");
             }
         });
 
