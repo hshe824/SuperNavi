@@ -9,7 +9,6 @@ using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-
 namespace SuperNaviBeaconAPI.Controllers
 {
     public class NavigationController : ApiController
@@ -44,7 +43,7 @@ namespace SuperNaviBeaconAPI.Controllers
             Session is created
         */
         [Route("~/api/navigation/item/{phoneID}")]
-        public HttpStatusCode Post(DtoItemList list, String phoneID)
+        public IEnumerable<DtoItem> Post(DtoItemList list, String phoneID)
         {
             String supermarketName = "";
 
@@ -90,7 +89,7 @@ namespace SuperNaviBeaconAPI.Controllers
             //Store the session
             connections[ipAddress] = session;
 
-            return HttpStatusCode.OK;
+            return new List<DtoItem>();
         }
 
         // POST api/Navigation
