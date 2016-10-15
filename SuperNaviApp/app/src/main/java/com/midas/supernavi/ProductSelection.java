@@ -59,6 +59,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private BeaconManager beaconManager;
     private RequestQueue requestQueue;
     private List<Beacon> currentBeaconList;
+    private boolean firstTime=true;
 
     private static final int SPEECH_REQUEST_CODE = 0;
 
@@ -104,7 +105,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         populateListView();
         //Default mode is product selection
         setTitle("SuperNavi - Product Selection");
-        currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
+        //currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
         modeSelector = (VerticalSeekBar) findViewById(R.id.modeSelector);
         modeSelector.setOnSeekBarChangeListener(new modeListener());
         Button speakCommand = (Button) findViewById(R.id.speakCommand);
@@ -119,10 +120,13 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR) {
                     textToSpeech.setLanguage(Locale.ENGLISH);
+                    textToSpeech.setSpeechRate((float) 0.85);
+                    String introMessage = "Welcome to SuperNavi! For instructions on using the app, please click the speak button, which is a large bottom right of the screen. Then say, Getting Started";
+                    textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
                 }
             }
         });
-        textToSpeech.setSpeechRate((float) 0.85);
+        //textToSpeech.setSpeechRate((float) 0.85);
 
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.BLUETOOTH);
@@ -170,6 +174,9 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         beaconManager.bind(this);
 
         requestQueue = Volley.newRequestQueue(this);
+
+        productSelection();
+
     }
 
     //Handles product selection mode
