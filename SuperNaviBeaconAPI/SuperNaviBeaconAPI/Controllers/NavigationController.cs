@@ -97,7 +97,7 @@ namespace SuperNaviBeaconAPI.Controllers
             Get the direction given the current position
         */
         [Route("~/api/navigation/{phoneID}")]
-        public String Post(DtoBeaconList list, String phoneID)
+        public DtoString Post(DtoBeaconList list, String phoneID)
         {
             String ipAddress = phoneID;
             //Retrieve session with IP Address
@@ -112,7 +112,7 @@ namespace SuperNaviBeaconAPI.Controllers
                     Left
                     Right
             */
-            return session.GetDirection();
+            return new DtoString(session.GetDirection());
         }
 
         // DELETE api/Navigation/reset
