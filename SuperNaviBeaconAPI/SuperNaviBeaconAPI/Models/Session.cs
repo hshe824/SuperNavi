@@ -181,11 +181,10 @@ namespace SuperNaviBeaconAPI.Models
                 return ("Thank you for using SuperNavi! Hope you enjoyed this service.");
             }
 
-            if (current.Equals(travelPath[travelPath.Count - 2])){
-                return "";
-            }
 
             StringBuilder command = new StringBuilder();
+
+            int prevOrientation = this.Direction;
 
             calcDirection();
 
@@ -199,16 +198,18 @@ namespace SuperNaviBeaconAPI.Models
                 else {
                     command.Append("left.SIGNATURE");
                 }
+                prevCommand = command.ToString();
                 return command.ToString();
             }
 
 
             command.Append(calculatePath(current, currentTarget));
 
-            if (command.ToString().Equals(prevCommand)) {
+            if (command.ToString().Equals(prevCommand) && prevOrientation == this.Direction) {
                 return "SAME";
             }
 
+            prevCommand = command.ToString();
             return command.ToString();
         }
 
