@@ -44,13 +44,13 @@ namespace SuperNaviBeaconAPI.Controllers
         // GET api/Navigation/retrieved
         [Route("api/navigation/retrieved/{phoneID}")]
         [HttpGet]
-        public DtoString RetrievedItem(String phoneID)
+        public String RetrievedItem(String phoneID)
         {
             Session session = connections[phoneID];
 
             String command = session.collectedItem();
 
-            return new DtoString(command);
+            return command;
         }
 
         //POST api.Navigation
