@@ -283,6 +283,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
             Log.d("Matches:", matches.toString());
             //Global commands to change mode etc
             checkCommand(matches);
+        } else {
+            tts("Sorry, I could not recognise that last command, please try again", true);
         }
     }
 
@@ -328,6 +330,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                 addItem(addOrDelete);
             } else if (addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
                 deleteItem(addOrDelete);
+            } else {
+                tts("Sorry, I could not recognise that last command, please try again", true);
             }
         } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
             tts("Cannot add or delete in this mode, please change to product selection mode", true);
