@@ -181,8 +181,14 @@ namespace SuperNaviBeaconAPI.Models
                 return ("Thank you for using SuperNavi! Hope you enjoyed this service.");
             }
 
+            if (current.Equals(travelPath[travelPath.Count - 2])){
+                return "";
+            }
+
             StringBuilder command = new StringBuilder();
+
             calcDirection();
+
             //if at target alert them
             if (current.Equals(currentTarget)) {
                 command.Append(groceryList[0].name + " is on the ");
