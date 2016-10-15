@@ -23,10 +23,11 @@ namespace SuperNaviBeaconAPI.Controllers
         private CloudTable itemTable = CloudStorageAccount.Parse(
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Item");
 
-        [Route("~/api/freeroam/{phoneID}")]
-        public String Post(DtoBeaconList list, String phoneID)
+        [Route("~/api/Navigation/freeroam/{phoneID}")]
+        [HttpPost]
+        public String Freeroam(DtoBeaconList list, String phoneID)
         {
-            if (connections.Keys.Contains(phoneID)) {
+            if (!connections.Keys.Contains(phoneID)) {
                 DtoItemList emptyList = new DtoItemList()
                 {
                     shoppingList = new List<DtoItem>(),

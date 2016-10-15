@@ -56,8 +56,10 @@ namespace SuperNaviBeaconAPI.Models
                 }
             }
 
-            orderGroceries();
-            generateTargetPoints();
+            if (groc.Count > 0) {
+                orderGroceries();
+                generateTargetPoints();
+            }
         }
 
         //Use this to indicate the item was collected
