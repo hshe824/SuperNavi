@@ -57,6 +57,7 @@ namespace SuperNaviBeaconAPI.Controllers
                    entity.uuid == list.beacon.uuid)
                 {
                     supermarketName = entity.supermarket;
+                    break;
                 }
             }
 
