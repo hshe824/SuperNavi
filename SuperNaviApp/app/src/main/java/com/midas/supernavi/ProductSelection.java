@@ -136,9 +136,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         Button speakCommand = (Button) findViewById(R.id.speakCommand);
         speakCommand.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-//                textToSpeech.stop();
-//                displaySpeechRecognizer();
-                showPickupDialog();
+                textToSpeech.stop();
+                displaySpeechRecognizer();
             }
         });
 
