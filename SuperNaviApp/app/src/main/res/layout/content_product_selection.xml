@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.midas.supernavi.ProductSelection">
@@ -17,7 +17,8 @@
         android:layout_height="150dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:id="@+id/verticalSeekBarWrapper2">
         <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
             android:id="@+id/modeSelector"
             android:max="2"
@@ -26,7 +27,6 @@
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
             android:paddingTop="15dp"
-            android:paddingBottom="20dp"
             android:splitTrack="false"
             app:seekBarRotation="CW90" /> <!-- Rotation: CW90 or CW270 -->
     </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
@@ -40,12 +40,15 @@
 
     <Button
         android:text="Speak Command"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
+        android:layout_width="fill_parent"
         android:id="@+id/speakCommand"
+        android:drawableLeft="@mipmap/ic_launcher"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/verticalSeekBarWrapper"
-        android:layout_alignStart="@+id/groceryList" />
+        android:textSize="24dp"
+        android:layout_toEndOf="@+id/verticalSeekBarWrapper2" />
+
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
 
 </RelativeLayout>

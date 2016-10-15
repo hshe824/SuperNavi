@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_name"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_gravity="center" android:orientation="vertical"  >
+
+    <Button
+        android:text="Picked up item"
+        android:layout_height="1700px"
+        android:layout_width="900px"
+        android:id="@+id/picked_up_item"
+        android:onClick="pickUpItem"
+        android:textSize="30dp" />
+</LinearLayout>
