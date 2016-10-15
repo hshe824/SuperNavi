@@ -37,6 +37,7 @@ namespace SuperNaviBeaconAPI.Models
         private Dictionary<int, string> relativeDirectionMap = new Dictionary<int, string>();
 
         private String prevCommand;
+        private DateTime prevCommandTime = DateTime.Now;
 
         /**
             Update the current position given the new beacon data
@@ -77,7 +78,9 @@ namespace SuperNaviBeaconAPI.Models
                 command.Append("Now collecting " + groceryList[0].name);                
                 //ADD NEXT DIRECTION
             }
+            prevCommandTime = DateTime.Now;
             command.Append(calculatePath(travelPath[travelPath.Count - 1], currentTarget));
+            prevCommand = command.ToString();
             return command.ToString();
         }
 
@@ -171,6 +174,7 @@ namespace SuperNaviBeaconAPI.Models
             //must be first poll, get user to walk to right
             if (travelPath.Count < 2)
             {
+                prevCommandTime = DateTime.Now;
                 return ("Welcome to " + supermarket.name + ". Proceed by walking to the right.");
             }
 
@@ -199,16 +203,19 @@ namespace SuperNaviBeaconAPI.Models
                     command.Append("left.SIGNATURE");
                 }
                 prevCommand = command.ToString();
+                prevCommandTime = DateTime.Now;
                 return command.ToString();
             }
 
 
             command.Append(calculatePath(current, currentTarget));
+            TimeSpan diff =  DateTime.Now.Subtract(prevCommandTime);
 
-            if (command.ToString().Equals(prevCommand) && prevOrientation == this.Direction) {
+            if (command.ToString().Equals(prevCommand) && prevOrientation == this.Direction && diff.TotalSeconds < 5) {
                 return "SAME";
             }
 
+            prevCommandTime = DateTime.Now;
             prevCommand = command.ToString();
             return command.ToString();
         }
