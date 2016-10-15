@@ -126,32 +126,36 @@ namespace SuperNaviBeaconAPI.Models
                     List<Beacon> beaconsAtThatPosition = supermarket.GetBeaconDataAtPosition(x, y);
 
                     //Map it so we dont have to for loop twice
-                    Dictionary<String, Beacon> beaconsAtThatPositionMap = new Dictionary<String, Beacon>();
+                    Dictionary<String, DtoBeacon> challengeMap = new Dictionary<String, DtoBeacon>();
 
-                    foreach (Beacon beacon in beaconsAtThatPosition)
+                    foreach (DtoBeacon beacon in beacons)
                     {
-                        beaconsAtThatPositionMap[beacon.uuid + beacon.majorid + beacon.minorid] = beacon;
+                        challengeMap[beacon.uuid + beacon.majorid + beacon.minorid] = beacon;
                     }
 
                     int localScore = 0;
 
                     //For each beacon data client has just picked up
-                    foreach(DtoBeacon beaconChallenge in beacons)
+                    foreach(Beacon beacon in beaconsAtThatPosition)
                     {
-                        String key = beaconChallenge.uuid + beaconChallenge.majorid + beaconChallenge.minorid;
-                        //If the template had the beacon data
-                        if(beaconsAtThatPositionMap.ContainsKey(key))
+                        String key = beacon.uuid + beacon.majorid + beacon.minorid;
+                        //Calculate the difference using sum of squared differences
+                        DtoBeacon challengeBeacon;
+                        if (challengeMap.ContainsKey(key))
                         {
-                            //Calculate the difference using sum of squared differences
-                            Beacon beaconTemplate = beaconsAtThatPositionMap[key];
-                            localScore += Math.Abs((int)(Math.Pow(beaconChallenge.rssi, 2) - Math.Pow(beaconTemplate.rssi, 2)));
+                            challengeBeacon = challengeMap[key];
                         }
                         else
                         {
-                            //If template didnt have it, punish the point as it is unlikely that it is this position
-                            localScore += 30;
+                            challengeBeacon = new DtoBeacon()
+                            {
+                                rssi = 0,
+                            };
                         }
+                        localScore += Math.Abs((int)(Math.Pow(beacon.rssi, 2) - Math.Pow(challengeBeacon.rssi, 2)));
+                        
                     }
+                    
 
                     //If the current score was less than the minimum so far, replace it
                     if(minimumDifferencePoint.Score > localScore)
