@@ -313,8 +313,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
-        } else if (matches.contains("clear shopping list")){
-          //  clearShoppingList();
+        } else if (matches.contains("clear shopping list") || matches.contains("reset shopping list")|| matches.contains("empty shopping list")){
+            clearShoppingList();
         } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
             if (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add")) {
                 addItem(addOrDelete);
@@ -330,10 +330,12 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         return false;
     }
 
-//    private void clearShoppingList(){
-//            gList = new ArrayList<String>();
-//            adapter.notifyDataSetChanged();
-//    }
+    private void clearShoppingList(){
+            for (int i= gList.size()-1; i>=0;i--){
+                gList.remove(i);
+            }
+        adapter.notifyDataSetChanged();
+    }
     private void readShoppingList() {
         tts("Your shopping list contains:");
         Log.v("Grocery list:", gList.toString());
