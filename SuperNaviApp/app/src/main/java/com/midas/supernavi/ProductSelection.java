@@ -1,6 +1,10 @@
 package com.midas.supernavi;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -57,9 +61,7 @@ import java.util.concurrent.TimeUnit;
 import static com.midas.supernavi.R.id.groceryList;
 
 
-
-
-public class ProductSelection extends AppCompatActivity implements BeaconConsumer, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener{
+public class ProductSelection extends AppCompatActivity implements BeaconConsumer{
 
     private VerticalSeekBar modeSelector;
     private OperatingMode currentOperatingMode;
@@ -69,9 +71,10 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private BeaconManager beaconManager;
     private RequestQueue requestQueue;
     private List<Beacon> currentBeaconList;
-    private static final String DEBUG_TAG = "Gestures";
-    private GestureDetectorCompat mDetector;
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private GestureDetectorCompat mDetector;
+
+
 
 
     private static final int SPEECH_REQUEST_CODE = 0;
@@ -110,6 +113,14 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     }
 
+    public void onTap(){
+
+
+
+    }
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,7 +147,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                 if (status != TextToSpeech.ERROR) {
                     textToSpeech.setLanguage(Locale.ENGLISH);
                     textToSpeech.setSpeechRate((float) 0.85);
-                    String introMessage = "Welcome to Super Navie! For instructions on how to use the app, please click on the speak button, which is a large button at the bottom right of the screen. Then say, Getting Started";
+                    String introMessage = "Welcome to SuperNavi! For instructions on how to use the app, please click on the speak button, which is a large button at the bottom right of the screen. Then say, Getting Started";
                     textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
                 }
             }
@@ -190,10 +201,11 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         requestQueue = Volley.newRequestQueue(this);
 
-        mDetector = new GestureDetectorCompat(this,this);
-        // Set the gesture detector as the double tap
-        // listener.
-        mDetector.setOnDoubleTapListener(this);
+        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+        Log.d("Detector:",mDetector.toString());
+
+        PickUpItemFragment fr = new PickUpItemFragment();
+        fr.show(getFragmentManager(),"s");
 
         productSelection();
 
@@ -267,7 +279,14 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                                                     @Override
                                                     public void onResponse(JSONObject response) {
                                                         try {
-                                                            tts(response.getString("str"));
+                                                            String responseString = response.getString("str");
+                                                            if (responseString.endsWith("SIGNATURE")){
+                                                                responseString = responseString.replaceAll("SIGNATURE","");
+                                                                tts(responseString);
+                                                                onTap();
+                                                            } else {
+                                                                tts(responseString);
+                                                            }
                                                         } catch (JSONException e) {
                                                             e.printStackTrace();
                                                         }
@@ -576,63 +595,54 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     @Override
     public boolean onTouchEvent(MotionEvent event){
         this.mDetector.onTouchEvent(event);
-        // Be sure to call the superclass implementation
         return super.onTouchEvent(event);
+
     }
 
-    @Override
-    public boolean onDown(MotionEvent event) {
-        Log.d(DEBUG_TAG,"onDown: " + event.toString());
-        return true;
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d(DEBUG_TAG,"onDown: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent event) {
+            tts("Tapped");
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            tts("Tapped");
+            return true;
+        }
     }
 
-    @Override
-    public boolean onFling(MotionEvent event1, MotionEvent event2,
-                           float velocityX, float velocityY) {
-        Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
-        return true;
+    public static class PickUpItemFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Added item?")
+                    .setPositiveButton("Picked up", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
     }
 
-    @Override
-    public void onLongPress(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onLongPress: " + event.toString());
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                            float distanceY) {
-        Log.d(DEBUG_TAG, "onScroll: " + e1.toString()+e2.toString());
-        return true;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onShowPress: " + event.toString());
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onDoubleTap: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onDoubleTapEvent: " + event.toString());
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event) {
-        Log.d(DEBUG_TAG, "onSingleTapConfirmed: " + event.toString());
-        return true;
-    }
 
 
 }
