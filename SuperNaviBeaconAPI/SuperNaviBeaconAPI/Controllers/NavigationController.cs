@@ -43,7 +43,7 @@ namespace SuperNaviBeaconAPI.Controllers
             Session is created
         */
         [Route("~/api/navigation/item/{phoneID}")]
-        public IEnumerable<DtoItem> Post(DtoItemList list, String phoneID)
+        public DtoItem Post(DtoItemList list, String phoneID)
         {
             String supermarketName = "";
 
@@ -89,7 +89,7 @@ namespace SuperNaviBeaconAPI.Controllers
             //Store the session
             connections[ipAddress] = session;
 
-            return new List<DtoItem>();
+            return new DtoItem();
         }
 
         // POST api/Navigation
