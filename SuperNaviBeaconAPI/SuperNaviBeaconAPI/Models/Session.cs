@@ -204,6 +204,50 @@ namespace SuperNaviBeaconAPI.Models
             return command.ToString();
         }
 
+        //Getting all the items right next to the current location of the user
+        internal String getNearbyItems(DtoBeaconList list) {
+            StringBuilder reply = new StringBuilder();
+            UpdateNewPosition(list.beacons);
+
+            Point currentPos = travelPath[travelPath.Count - 1];
+
+            Boolean isLeft = false;
+            //Getting all the items next to the users current position;
+            foreach(Item i in supermarketItems){
+                int offset = 1;
+                if (i.side.ToLower().Equals("left")) {
+                    offset = -1;
+                    isLeft = true;
+                }
+
+                Point p = new Point()
+                {
+                    X = i.positionX + offset,
+                    Y = i.positionY,
+                };
+
+                if (p.Equals(currentPos)) {
+                    reply.Append(i.name + ", ");
+                }
+            }
+
+            if (reply.ToString() == null || reply.ToString().Equals("")) {
+                return "there are no items right next to you currently";
+            }
+
+            reply.Append("is on the ");
+            if ((isLeft && Direction == 0) || (!isLeft && Direction == 180))
+            {
+                reply.Append("right.");
+            }
+            else
+            {
+                reply.Append("left.");
+            }
+
+            return reply.ToString();
+        }
+
         //Calculating the direction user is facing from current point relative to next point
         private void calcDirection() {
             Point current = travelPath[travelPath.Count - 1];
@@ -230,6 +274,7 @@ namespace SuperNaviBeaconAPI.Models
             }
         }
 
+        //Calculating the path to take next
         private string calculatePath(Point current, Point end)
         {
             int absDir = 0;
@@ -270,6 +315,7 @@ namespace SuperNaviBeaconAPI.Models
             return command;
         }
 
+        //Populating map containing the relative direction to the associated command
         private void populateRelativeMap() {
             relativeDirectionMap.Add(0, "Keep Going Straight.");
             relativeDirectionMap.Add(90, "Turn Right.");
