@@ -26,11 +26,11 @@ namespace SuperNaviBeaconAPI.Models
         */
         public void SetUp()
         {
-            for(int x = 0; x < 10; x++)
+            for(int x = 0; x < 5; x++)
             {
-                for(int y = 0; y < 10; y++)
+                for(int y = 0; y < 5; y++)
                 {
-                    if (x % 3 != 2 || y == 0 || y == 9)
+                    if (x % 2 != 0 || y == 0 || y == 4)
                         map[new Point()
                         {
                             X = x,

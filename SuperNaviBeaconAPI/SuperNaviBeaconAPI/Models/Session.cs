@@ -118,9 +118,9 @@ namespace SuperNaviBeaconAPI.Models
 
             //Go through each X and Y to see which point has the smallest difference in RSSI value of beacons
             //Could be further optimised to start from the last point and spread outwards
-            for(int x = 0; x < 10; x++)
+            for(int x = 0; x < 5; x++)
             {
-                for(int y = 0; y < 10; y++)
+                for(int y = 0; y < 5; y++)
                 {
                     //Get all beacon data at the position
                     List<Beacon> beaconsAtThatPosition = supermarket.GetBeaconDataAtPosition(x, y);
