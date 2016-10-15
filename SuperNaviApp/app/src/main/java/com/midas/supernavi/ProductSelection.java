@@ -10,11 +10,14 @@ import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,10 +30,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.midas.supernavi.Models.DtoBeacon;
 import com.midas.supernavi.Models.DtoItem;
-import com.google.gson.Gson;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -47,7 +50,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -55,9 +57,10 @@ import java.util.concurrent.TimeUnit;
 import static com.midas.supernavi.R.id.groceryList;
 
 
-public class ProductSelection extends AppCompatActivity implements BeaconConsumer{
 
-    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+public class ProductSelection extends AppCompatActivity implements BeaconConsumer, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener{
+
     private VerticalSeekBar modeSelector;
     private OperatingMode currentOperatingMode;
     private TextToSpeech textToSpeech;
@@ -66,7 +69,10 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private BeaconManager beaconManager;
     private RequestQueue requestQueue;
     private List<Beacon> currentBeaconList;
-    private boolean firstTime=true;
+    private static final String DEBUG_TAG = "Gestures";
+    private GestureDetectorCompat mDetector;
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
 
     private static final int SPEECH_REQUEST_CODE = 0;
 
@@ -184,9 +190,19 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         requestQueue = Volley.newRequestQueue(this);
 
+        mDetector = new GestureDetectorCompat(this,this);
+        // Set the gesture detector as the double tap
+        // listener.
+        mDetector.setOnDoubleTapListener(this);
+
         productSelection();
 
     }
+
+
+
+    // Override onCreate() and anything else you want
+
 
     //Handles product selection mode
     private void productSelection() {
@@ -556,4 +572,68 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         }
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        this.mDetector.onTouchEvent(event);
+        // Be sure to call the superclass implementation
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onDown(MotionEvent event) {
+        Log.d(DEBUG_TAG,"onDown: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onFling(MotionEvent event1, MotionEvent event2,
+                           float velocityX, float velocityY) {
+        Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+        return true;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onLongPress: " + event.toString());
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                            float distanceY) {
+        Log.d(DEBUG_TAG, "onScroll: " + e1.toString()+e2.toString());
+        return true;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onShowPress: " + event.toString());
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onSingleTapUp: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onDoubleTap: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onDoubleTapEvent: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onSingleTapConfirmed: " + event.toString());
+        return true;
+    }
+
+
 }
+
