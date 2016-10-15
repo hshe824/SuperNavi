@@ -37,6 +37,7 @@ namespace SuperNaviBeaconAPI.Models
         private Dictionary<int, string> relativeDirectionMap = new Dictionary<int, string>();
 
         private String prevCommand;
+        private DateTime prevCommandTime = DateTime.Now;
 
         /**
             Update the current position given the new beacon data
@@ -56,8 +57,10 @@ namespace SuperNaviBeaconAPI.Models
                 }
             }
 
-            orderGroceries();
-            generateTargetPoints();
+            if (groc.Count > 0) {
+                orderGroceries();
+                generateTargetPoints();
+            }
         }
 
         //Use this to indicate the item was collected
@@ -75,7 +78,9 @@ namespace SuperNaviBeaconAPI.Models
                 command.Append("Now collecting " + groceryList[0].name);                
                 //ADD NEXT DIRECTION
             }
+            prevCommandTime = DateTime.Now;
             command.Append(calculatePath(travelPath[travelPath.Count - 1], currentTarget));
+            prevCommand = command.ToString();
             return command.ToString();
         }
 
@@ -169,6 +174,7 @@ namespace SuperNaviBeaconAPI.Models
             //must be first poll, get user to walk to right
             if (travelPath.Count < 2)
             {
+                prevCommandTime = DateTime.Now;
                 return ("Welcome to " + supermarket.name + ". Proceed by walking to the right.");
             }
 
@@ -179,8 +185,13 @@ namespace SuperNaviBeaconAPI.Models
                 return ("Thank you for using SuperNavi! Hope you enjoyed this service.");
             }
 
+
             StringBuilder command = new StringBuilder();
+
+            int prevOrientation = this.Direction;
+
             calcDirection();
+
             //if at target alert them
             if (current.Equals(currentTarget)) {
                 command.Append(groceryList[0].name + " is on the ");
@@ -191,17 +202,66 @@ namespace SuperNaviBeaconAPI.Models
                 else {
                     command.Append("left.SIGNATURE");
                 }
+                prevCommand = command.ToString();
+                prevCommandTime = DateTime.Now;
                 return command.ToString();
             }
 
 
             command.Append(calculatePath(current, currentTarget));
+            TimeSpan diff =  DateTime.Now.Subtract(prevCommandTime);
 
-            if (command.ToString().Equals(prevCommand)) {
+            if (command.ToString().Equals(prevCommand) && prevOrientation == this.Direction && diff.TotalSeconds < 5) {
                 return "SAME";
             }
 
+            prevCommandTime = DateTime.Now;
+            prevCommand = command.ToString();
             return command.ToString();
+        }
+
+        //Getting all the items right next to the current location of the user
+        internal String getNearbyItems(DtoBeaconList list) {
+            StringBuilder reply = new StringBuilder();
+            UpdateNewPosition(list.beacons);
+
+            Point currentPos = travelPath[travelPath.Count - 1];
+
+            Boolean isLeft = false;
+            //Getting all the items next to the users current position;
+            foreach(Item i in supermarketItems){
+                int offset = 1;
+                if (i.side.ToLower().Equals("left")) {
+                    offset = -1;
+                    isLeft = true;
+                }
+
+                Point p = new Point()
+                {
+                    X = i.positionX + offset,
+                    Y = i.positionY,
+                };
+
+                if (p.Equals(currentPos)) {
+                    reply.Append(i.name + ", ");
+                }
+            }
+
+            if (reply.ToString() == null || reply.ToString().Equals("")) {
+                return "there are no items right next to you currently";
+            }
+
+            reply.Append("is on the ");
+            if ((isLeft && Direction == 0) || (!isLeft && Direction == 180))
+            {
+                reply.Append("right.");
+            }
+            else
+            {
+                reply.Append("left.");
+            }
+
+            return reply.ToString();
         }
 
         //Calculating the direction user is facing from current point relative to next point
@@ -230,6 +290,7 @@ namespace SuperNaviBeaconAPI.Models
             }
         }
 
+        //Calculating the path to take next
         private string calculatePath(Point current, Point end)
         {
             int absDir = 0;
@@ -270,6 +331,7 @@ namespace SuperNaviBeaconAPI.Models
             return command;
         }
 
+        //Populating map containing the relative direction to the associated command
         private void populateRelativeMap() {
             relativeDirectionMap.Add(0, "Keep Going Straight.");
             relativeDirectionMap.Add(90, "Turn Right.");

@@ -22,6 +22,24 @@ namespace SuperNaviBeaconAPI.Controllers
         private CloudTable itemTable = CloudStorageAccount.Parse(
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Item");
 
+        [Route("~/api/Navigation/freeroam/{phoneID}")]
+        [HttpPost]
+        public DtoString Freeroam(DtoBeaconList list, String phoneID)
+        {
+            if (!connections.Keys.Contains(phoneID)) {
+                DtoItemList emptyList = new DtoItemList()
+                {
+                    shoppingList = new List<DtoItem>(),
+                    beacon = list.beacons[0],
+                };
+
+                connections.Add(phoneID, generateSession(emptyList, phoneID));
+            }
+
+            Session retrieved = connections[phoneID];
+            return new DtoString(retrieved.getNearbyItems(list));
+        }
+
 
         // GET api/Navigation/retrieved
         [Route("api/navigation/retrieved/{phoneID}")]
@@ -45,49 +63,9 @@ namespace SuperNaviBeaconAPI.Controllers
         [Route("~/api/navigation/item/{phoneID}")]
         public DtoItem Post(DtoItemList list, String phoneID)
         {
-            String supermarketName = "";
-
-            //Get the name of the supermarket with one of the beacons
-            TableQuery<Beacon> supermarketQuery = new TableQuery<Beacon>();
-            foreach (Beacon entity in beaconTable.ExecuteQuery(supermarketQuery))
-            {
-                if (entity.majorid == list.beacon.majorid &&
-                   entity.minorid == list.beacon.minorid &&
-                   entity.uuid == list.beacon.uuid)
-                {
-                    supermarketName = entity.supermarket;
-                    break;
-                }
-            }
-
-            //Get IP Address
-            String ipAddress = phoneID;
-
-            //Get all beacon data for the supermarket
-            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarketName));
-            List<Beacon> allBeaconData = beaconTable.ExecuteQuery(query).ToList();
-
-
-            //Make the supermarket with the name and the beacon data
-            Supermarket supermarket = new Supermarket()
-            {
-                name = supermarketName,
-                allBeaconData = allBeaconData,
-                exit = new Models.Point() { X = 9, Y = 0},
-            };
-
-            supermarket.SetUp();
-
-            //Getting all items from the supermarket
-            List<Item> supermarketItems = new List<Item>();
-            TableQuery<Item> queryItems = new TableQuery<Item>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket.name));
-            foreach (Item item in itemTable.ExecuteQuery(queryItems)) {supermarketItems.Add(item);}
-
-            //Make the session
-            Session session = new Session(list.shoppingList, supermarket, supermarketItems);
             
             //Store the session
-            connections[ipAddress] = session;
+            connections[phoneID] = generateSession(list, phoneID);
 
             return new DtoItem();
         }
@@ -122,5 +100,46 @@ namespace SuperNaviBeaconAPI.Controllers
         {
             connections.Clear();
         }
+
+        private Session generateSession(DtoItemList list, String phoneID)
+        {
+            String supermarketName = "";
+
+            //Get the name of the supermarket with one of the beacons
+            TableQuery<Beacon> supermarketQuery = new TableQuery<Beacon>();
+            foreach (Beacon entity in beaconTable.ExecuteQuery(supermarketQuery))
+            {
+                if (entity.majorid == list.beacon.majorid &&
+                   entity.minorid == list.beacon.minorid &&
+                   entity.uuid == list.beacon.uuid)
+                {
+                    supermarketName = entity.supermarket;
+                }
+            }
+
+            //Get all beacon data for the supermarket
+            TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarketName));
+            List<Beacon> allBeaconData = beaconTable.ExecuteQuery(query).ToList();
+
+
+            //Make the supermarket with the name and the beacon data
+            Supermarket supermarket = new Supermarket()
+            {
+                name = supermarketName,
+                allBeaconData = allBeaconData,
+                exit = new Models.Point() { X = 9, Y = 0 },
+            };
+
+            supermarket.SetUp();
+
+            //Getting all items from the supermarket
+            List<Item> supermarketItems = new List<Item>();
+            TableQuery<Item> queryItems = new TableQuery<Item>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket.name));
+            foreach (Item item in itemTable.ExecuteQuery(queryItems)) { supermarketItems.Add(item); }
+
+            //Make the session
+            return new Session(list.shoppingList, supermarket, supermarketItems);
+        }
     }
+
 }
