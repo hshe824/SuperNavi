@@ -21,8 +21,8 @@ public class DtoBeacon {
     public int majorid;
     public int minorid;
     public int rssi;
-    public String supermarket = "";
+    public String supermarket;
     public int positionX;
     public int positionY;
-    public int coun = 0;
+    public int count = 0;
 }

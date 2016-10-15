@@ -11,9 +11,9 @@ public class DtoItem
         this.name=name;
     }
     public String name;
-    public String supermarket = "";
-    public int positionX = 0;
-    public int positionY = 0;
-    public String side = "";
+    public String supermarket;
+    public int positionX;
+    public int positionY;
+    public String side;
 
 }

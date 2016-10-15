@@ -30,6 +30,7 @@ import com.android.volley.toolbox.Volley;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 import com.midas.supernavi.Models.DtoBeacon;
 import com.midas.supernavi.Models.DtoItem;
+import com.google.gson.Gson;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -38,6 +39,7 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -45,12 +47,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.midas.supernavi.R.id.groceryList;
 
 
 public class ProductSelection extends AppCompatActivity implements BeaconConsumer{
 
+    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private VerticalSeekBar modeSelector;
     private OperatingMode currentOperatingMode;
     private TextToSpeech textToSpeech;
@@ -58,7 +65,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private ArrayAdapter<String> adapter;
     private BeaconManager beaconManager;
     private RequestQueue requestQueue;
-    private List<Beacon> currentBeaconList;
+    public List<Beacon> currentBeaconList;
+
 
     private static final int SPEECH_REQUEST_CODE = 0;
 
@@ -175,6 +183,9 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles product selection mode
     private void productSelection() {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
+        executor.shutdown();
+        executor = Executors.newScheduledThreadPool(1);
+
         Log.d("Mode", "Entering product selection mode");
         setTitle("SuperNavi - Product Selection");
         tts("Product selection mode", true);
@@ -196,7 +207,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     }
 
     private void sendRequest(List<DtoItem> dtoList) {
-        String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
+        final String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
                 Secure.ANDROID_ID);
 
         Log.d("AndroidID",android_id);
@@ -208,32 +219,78 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         Log.d("", "" + dtoList.size());
 
+        final Gson gson = new Gson();
+
         String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/item/"+android_id;
-        JSONArray jsArray = new JSONArray(dtoList);
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("shoppingList", dtoList);
-            jsonObject.put("beacon", new DtoBeacon(currentBeaconList.get(0)));
+            jsonObject.put("shoppingList", new JSONArray(gson.toJson(dtoList)));
+            jsonObject.put("beacon", new JSONObject(gson.toJson(new DtoBeacon(currentBeaconList.get(0)))));
             JsonObjectRequest jsObjRequest = new JsonObjectRequest
                     (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
 
                         @Override
                         public void onResponse(JSONObject response) {
-                            // List<DtoItem>  orderedDTOgList = response.;
+                            Log.d("hi", "hi");
+                            Runnable runnable = new Runnable() {
+                                public void run() {
+                                    String url1 = "http://supernavibeaconapi.azurewebsites.net/api/navigation/"+ android_id;
+                                    JSONObject jsonObject1 = new JSONObject();
+                                    try {
+                                        jsonObject1.put("beacons", new JSONArray(gson.toJson(toDtoBeaconList(currentBeaconList))));
+                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                                                (Request.Method.POST, url1, jsonObject1, new Response.Listener<JSONObject>() {
+                                                    @Override
+                                                    public void onResponse(JSONObject response) {
+                                                        try {
+                                                            tts(response.getString("str"));
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                        Log.d("Response 2", response.toString());
+                                                    }
+                                                }, new Response.ErrorListener() {
+                                                    @Override
+                                                    public void onErrorResponse(VolleyError error) {
+
+                                                    }
+                                                });
+
+                                        Log.d("Request 2", jsonObject1.toString());
+                                        requestQueue.add(jsonObjectRequest);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+
+                            executor.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+                            Log.d("Response 1", response.toString());
+
                         }
                     }, new Response.ErrorListener() {
 
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // TODO Auto-generated method stub
-
+                            Log.d("", error.toString());
                         }
                     });
-            Log.d("", jsonObject.toString());
+            Log.d("Request 1", jsonObject.toString());
             requestQueue.add(jsObjRequest);
         } catch (Exception e) {
             Log.e("Exception:", e.getMessage());
         }
+    }
+
+    private List<DtoBeacon> toDtoBeaconList(List<Beacon> currentBeaconList) {
+        List<DtoBeacon> list = new ArrayList<DtoBeacon>();
+
+        for(Beacon beacon : currentBeaconList){
+            DtoBeacon dto = new DtoBeacon(beacon);
+            list.add(dto);
+        }
+
+        return list;
     }
 
     private List<DtoItem> sanitiseList() {
@@ -249,6 +306,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles free roam mode
     private void freeRoam() {
         currentOperatingMode = OperatingMode.FREE_ROAM;
+        executor.shutdown();
+        executor = Executors.newScheduledThreadPool(1);
         Log.d("Mode", "Entering free roam mode");
         setTitle("SuperNavi - Free Roam");
         tts("free roam mode", true);
@@ -431,7 +490,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     //Creates grocery list
     private void populateListView() {
-        String[] groceries = {"milk", "bread"};
+        String[] groceries = {"soup"};
         gList = new ArrayList<String>(Arrays.asList(groceries));
 
         adapter = new ArrayAdapter<String>(this, R.layout.groceries, gList);

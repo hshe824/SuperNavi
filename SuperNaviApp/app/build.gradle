@@ -27,4 +27,5 @@ dependencies {
     compile 'org.altbeacon:android-beacon-library:2+'
     compile 'com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:0.7.0'
     compile 'com.android.volley:volley:1.0.0'
+    compile 'com.google.code.gson:gson:1.7.2'
 }
