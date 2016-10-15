@@ -335,13 +335,18 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                 gList.remove(i);
             }
         adapter.notifyDataSetChanged();
+        tts("Shopping list cleared!");
     }
     private void readShoppingList() {
-        tts("Your shopping list contains:");
-        Log.v("Grocery list:", gList.toString());
-        for (String grocery : gList) {
-            Log.d("grocery:", grocery);
-            tts(grocery);
+        if (gList.size()==0){
+            tts("Your shopping list is empty! Please add some items");
+        } else {
+            tts("Your shopping list contains:");
+            Log.v("Grocery list:", gList.toString());
+            for (String grocery : gList) {
+                Log.d("grocery:", grocery);
+                tts(grocery);
+            }
         }
 
     }
