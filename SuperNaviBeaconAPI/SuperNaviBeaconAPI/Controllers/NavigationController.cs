@@ -47,6 +47,12 @@ namespace SuperNaviBeaconAPI.Controllers
             return command;
         }
 
+        [Route("~/api/navigation/freeroam")]
+        [HttpGet]
+        public String Get() {
+
+        }
+
         //Post api/Navigation
         [Route("~/api/navigation/")]
         public String Post(DtoBeacon beacon)
