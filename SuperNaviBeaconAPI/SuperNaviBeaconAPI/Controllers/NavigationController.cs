@@ -9,7 +9,6 @@ using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-
 namespace SuperNaviBeaconAPI.Controllers
 {
     public class NavigationController : ApiController
@@ -25,7 +24,7 @@ namespace SuperNaviBeaconAPI.Controllers
 
         [Route("~/api/Navigation/freeroam/{phoneID}")]
         [HttpPost]
-        public String Freeroam(DtoBeaconList list, String phoneID)
+        public DtoString Freeroam(DtoBeaconList list, String phoneID)
         {
             if (!connections.Keys.Contains(phoneID)) {
                 DtoItemList emptyList = new DtoItemList()
@@ -38,7 +37,7 @@ namespace SuperNaviBeaconAPI.Controllers
             }
 
             Session retrieved = connections[phoneID];
-            return retrieved.getNearbyItems(list);
+            return new DtoString(retrieved.getNearbyItems(list));
         }
 
 
@@ -62,14 +61,13 @@ namespace SuperNaviBeaconAPI.Controllers
             Session is created
         */
         [Route("~/api/navigation/item/{phoneID}")]
-        public HttpStatusCode Post(DtoItemList list, String phoneID)
+        public DtoItem Post(DtoItemList list, String phoneID)
         {
-           
             
             //Store the session
             connections[phoneID] = generateSession(list, phoneID);
 
-            return HttpStatusCode.OK;
+            return new DtoItem();
         }
 
         // POST api/Navigation
@@ -77,7 +75,7 @@ namespace SuperNaviBeaconAPI.Controllers
             Get the direction given the current position
         */
         [Route("~/api/navigation/{phoneID}")]
-        public String Post(DtoBeaconList list, String phoneID)
+        public DtoString Post(DtoBeaconList list, String phoneID)
         {
             String ipAddress = phoneID;
             //Retrieve session with IP Address
@@ -92,7 +90,7 @@ namespace SuperNaviBeaconAPI.Controllers
                     Left
                     Right
             */
-            return session.GetDirection();
+            return new DtoString(session.GetDirection());
         }
 
         // DELETE api/Navigation/reset
