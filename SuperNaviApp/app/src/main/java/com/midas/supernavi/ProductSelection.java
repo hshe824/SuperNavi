@@ -32,6 +32,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
@@ -61,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 import static com.midas.supernavi.R.id.groceryList;
 
 
-public class ProductSelection extends AppCompatActivity implements BeaconConsumer{
+public class ProductSelection extends AppCompatActivity implements BeaconConsumer {
 
     private VerticalSeekBar modeSelector;
     private OperatingMode currentOperatingMode;
@@ -75,9 +76,6 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> lastFuture;
     private static PickUpItemFragment fr = new PickUpItemFragment();
-
-
-
 
 
     private static final int SPEECH_REQUEST_CODE = 0;
@@ -116,12 +114,11 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     }
 
-    public void showPickupDialog(){
+    public void showPickupDialog() {
         tts("Please tap the screen to confirm you have picked up the item");
-        fr.show(getFragmentManager(),"Pickup");
+        fr.show(getFragmentManager(), "Pickup");
 
     }
-
 
 
     @Override
@@ -153,7 +150,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                     textToSpeech.setLanguage(Locale.ENGLISH);
                     textToSpeech.setSpeechRate((float) 0.85);
                     String introMessage = "Welcome to SuperNavi! For instructions on how to use the app, please click on the speak button, which is a large button at the bottom right of the screen. Then say, Getting Started";
-                   // textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
+                    // textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
                 }
             }
         });
@@ -174,25 +171,25 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         Log.d("", "Bluetooth: " + permissionAdminCheck);
         Log.d("", "Bluetooth Admin: " + permissionAdminCheck);
 
-        if(permissionCheck != PackageManager.PERMISSION_GRANTED){
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.BLUETOOTH},
                     0);
         }
 
-        if(permissionAdminCheck != PackageManager.PERMISSION_GRANTED){
+        if (permissionAdminCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.BLUETOOTH_ADMIN},
                     0);
         }
 
-        if(permissionCoarseLocationCheck != PackageManager.PERMISSION_GRANTED){
+        if (permissionCoarseLocationCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     0);
         }
 
-        if(permissionFineLocationCheck != PackageManager.PERMISSION_GRANTED){
+        if (permissionFineLocationCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     0);
@@ -207,15 +204,14 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         requestQueue = Volley.newRequestQueue(this);
 
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
-        Log.d("Detector:",mDetector.toString());
+        Log.d("Detector:", mDetector.toString());
 
         productSelection();
 
     }
 
 
-
-    public void pickUpItem(View view){
+    public void pickUpItem(View view) {
 
         fr.dismiss();
     }
@@ -223,7 +219,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles product selection mode
     private void productSelection() {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
-        if(lastFuture != null)
+        if (lastFuture != null)
             lastFuture.cancel(true);
 
         Log.d("Mode", "Entering product selection mode");
@@ -240,19 +236,39 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         setTitle("SuperNavi - Navigation");
         tts("Navigation mode", true);
         List<DtoItem> dtoList = sanitiseList();
-        sendRequest(dtoList);
-        Log.d("Grocery list posted:",dtoList.toString());
+        sendPostRequest(dtoList);
+        Log.d("Grocery list posted:", dtoList.toString());
 
 
     }
 
-    private void sendRequest(List<DtoItem> dtoList) {
+    private void sendGetRequest(String route) {
+        final String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
+                Secure.ANDROID_ID);
+        final Gson gson = new Gson();
+
+        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/retrieved/" + android_id;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        tts(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+        requestQueue.add(stringRequest);
+    }
+
+    private void sendPostRequest(List<DtoItem> dtoList) {
         final String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
                 Secure.ANDROID_ID);
 
-        Log.d("AndroidID",android_id);
+        Log.d("AndroidID", android_id);
 
-        if(currentBeaconList.size() == 0){
+        if (currentBeaconList.size() == 0) {
             Log.d("", "No beacons found");
             return;
         }
@@ -261,7 +277,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         final Gson gson = new Gson();
 
-        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/item/"+android_id;
+        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/item/" + android_id;
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("shoppingList", new JSONArray(gson.toJson(dtoList)));
@@ -274,7 +290,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                             Log.d("hi", "hi");
                             Runnable runnable = new Runnable() {
                                 public void run() {
-                                    String url1 = "http://supernavibeaconapi.azurewebsites.net/api/navigation/"+ android_id;
+                                    String url1 = "http://supernavibeaconapi.azurewebsites.net/api/navigation/" + android_id;
                                     JSONObject jsonObject1 = new JSONObject();
                                     try {
                                         jsonObject1.put("beacons", new JSONArray(gson.toJson(toDtoBeaconList(currentBeaconList))));
@@ -284,8 +300,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                                                     public void onResponse(JSONObject response) {
                                                         try {
                                                             String responseString = response.getString("str");
-                                                            if (responseString.endsWith("SIGNATURE")){
-                                                                responseString = responseString.replaceAll("SIGNATURE","");
+                                                            if (responseString.endsWith("SIGNATURE")) {
+                                                                responseString = responseString.replaceAll("SIGNATURE", "");
                                                                 tts(responseString);
                                                                 showPickupDialog();
                                                             } else {
@@ -333,7 +349,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private List<DtoBeacon> toDtoBeaconList(List<Beacon> currentBeaconList) {
         List<DtoBeacon> list = new ArrayList<DtoBeacon>();
 
-        for(Beacon beacon : currentBeaconList){
+        for (Beacon beacon : currentBeaconList) {
             DtoBeacon dto = new DtoBeacon(beacon);
             list.add(dto);
         }
@@ -354,7 +370,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles free roam mode
     private void freeRoam() {
         currentOperatingMode = OperatingMode.FREE_ROAM;
-        if(lastFuture != null)
+        if (lastFuture != null)
             lastFuture.cancel(true);
         Log.d("Mode", "Entering free roam mode");
         setTitle("SuperNavi - Free Roam");
@@ -419,7 +435,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
-        } else if (matches.contains("clear shopping list") || matches.contains("reset shopping list")|| matches.contains("empty shopping list")) {
+        } else if (matches.contains("clear shopping list") || matches.contains("reset shopping list") || matches.contains("empty shopping list")) {
             clearShoppingList();
         } else if (matches.contains("getting started")) {
             tts("There is a mode slider along the left edge of the screen. Drag this to change modes. The large speak command button is at the bottom right of the screen, click on this and say a command. Say help to get info on these commands for each mode", true);
@@ -433,6 +449,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
             }
         } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
             tts("Cannot add or delete in this mode, please change to product selection mode", true);
+        } else if (currentOperatingMode == OperatingMode.FREE_ROAM && matches.contains("whats here")) {
+            freeRoamQuery();
         } else {
             tts("Sorry, I could not recognise that last command, please try again", true);
         }
@@ -440,15 +458,53 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         return false;
     }
 
-    private void clearShoppingList(){
-            for (int i= gList.size()-1; i>=0;i--){
-                gList.remove(i);
-            }
+    private void freeRoamQuery(){
+        final String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
+                Secure.ANDROID_ID);
+
+        if (currentBeaconList.size() == 0) {
+            return;
+        }
+        final Gson gson = new Gson();
+
+        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/item/" + android_id;
+        JSONObject jsonObject1 = new JSONObject();
+        try {
+            jsonObject1.put("beacons", new JSONArray(gson.toJson(toDtoBeaconList(currentBeaconList))));
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, jsonObject1, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String responseString = response.getString("str");
+                                tts(responseString);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            Log.d("Response 2", response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    });
+            requestQueue.add(jsonObjectRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void clearShoppingList() {
+        for (int i = gList.size() - 1; i >= 0; i--) {
+            gList.remove(i);
+        }
         adapter.notifyDataSetChanged();
         tts("Shopping list cleared!");
     }
+
     private void readShoppingList() {
-        if (gList.size()==0){
+        if (gList.size() == 0) {
             tts("Your shopping list is empty! Please add some items");
         } else {
             tts("Your shopping list contains:");
@@ -590,15 +646,15 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
             }
         });
 
-        try{
+        try {
             beaconManager.startRangingBeaconsInRegion(new Region("defaultRegion", null, null, null));
-        }catch(RemoteException e){
+        } catch (RemoteException e) {
 
         }
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event){
+    public boolean onTouchEvent(MotionEvent event) {
         this.mDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
 
@@ -609,14 +665,14 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         @Override
         public boolean onDown(MotionEvent event) {
-            Log.d(DEBUG_TAG,"onDown: " + event.toString());
+            Log.d(DEBUG_TAG, "onDown: " + event.toString());
             return true;
         }
 
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
-            Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+            Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
             return true;
         }
 
@@ -644,7 +700,6 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         }
 
     }
-
 
 
 }
