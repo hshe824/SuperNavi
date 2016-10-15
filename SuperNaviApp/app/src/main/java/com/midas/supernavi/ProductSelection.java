@@ -73,6 +73,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
+            textToSpeech.stop();
             switch (progress) {
                 case 0:
                     productSelection();
@@ -111,6 +112,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         Button speakCommand = (Button) findViewById(R.id.speakCommand);
         speakCommand.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
+                textToSpeech.stop();
                 displaySpeechRecognizer();
             }
         });
@@ -121,7 +123,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                 if (status != TextToSpeech.ERROR) {
                     textToSpeech.setLanguage(Locale.ENGLISH);
                     textToSpeech.setSpeechRate((float) 0.85);
-                    String introMessage = "Welcome to SuperNavi! For instructions on using the app, please click the speak button, which is a large bottom right of the screen. Then say, Getting Started";
+                    String introMessage = "Welcome to Super Navie! For instructions on how to use the app, please click on the speak button, which is a large button at the bottom right of the screen. Then say, Getting Started";
                     textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
                 }
             }
@@ -307,9 +309,6 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
             }
             modeSelector.setProgress(2);
             return true;
-        } else if (matches.contains("where am i")) {
-            //TODO: Tell user where they are
-            return true;
         } else if (matches.contains("exit") || matches.contains("quit") || matches.contains("finished")) {
             tts("Exiting app");
             finish();
@@ -320,8 +319,10 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         } else if (matches.contains("read shopping list")) {
             readShoppingList();
             return true;
-        } else if (matches.contains("clear shopping list") || matches.contains("reset shopping list")|| matches.contains("empty shopping list")){
+        } else if (matches.contains("clear shopping list") || matches.contains("reset shopping list")|| matches.contains("empty shopping list")) {
             clearShoppingList();
+        } else if (matches.contains("getting started")) {
+            tts("There is a mode slider along the left edge of the screen. Drag this to change modes. The large speak command button is at the bottom right of the screen, click on this and say a command. Say help to get info on these commands for each mode", true);
         } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
             if (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add")) {
                 addItem(addOrDelete);
@@ -329,9 +330,9 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                 deleteItem(addOrDelete);
             }
         } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
-            tts("Cannot add or delete in this mode, please change to product selection mode");
+            tts("Cannot add or delete in this mode, please change to product selection mode", true);
         } else {
-            tts("Sorry, I could not recognise that last command, please try again");
+            tts("Sorry, I could not recognise that last command, please try again", true);
         }
 
         return false;
@@ -361,13 +362,13 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private void help(ArrayList<String> matches) {
         switch (currentOperatingMode) {
             case PRODUCT_SELECTION:
-                tts("You are in product selection mode. Simply click the speak button and say an item you want to add to your shopping list");
+                tts("You are in product selection mode. Simply click the speak button and say add and then the item you want to add to your shopping list", true);
                 break;
             case FREE_ROAM:
-                tts("You are in free roam mode. I will say what items you are passing in this supermarket as you walk around freely");
+                tts("You are in free roam mode. I will say what items you are passing in this supermarket as you walk around freely", true);
                 break;
             case NAVIGATION:
-                tts("You are in navigation mode. I will guide you around to pick up all the items on your grocery list");
+                tts("You are in navigation mode. I will guide you around to pick up all the items on your grocery list", true);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid Mode");
