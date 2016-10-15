@@ -12,6 +12,6 @@ namespace SuperNaviBeaconAPI.Models
             this.str = str;
         }
 
-        String str { get; set; }
+        public String str { get; set; }
     }
 }
