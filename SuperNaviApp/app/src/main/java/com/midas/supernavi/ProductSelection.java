@@ -1,10 +1,7 @@
 package com.midas.supernavi;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,10 +16,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -72,10 +71,11 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private BeaconManager beaconManager;
     private RequestQueue requestQueue;
     private List<Beacon> currentBeaconList;
-    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private GestureDetectorCompat mDetector;
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> lastFuture;
+    private static PickUpItemFragment fr = new PickUpItemFragment();
+
 
 
 
@@ -116,9 +116,9 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     }
 
-    public void onTap(){
-
-
+    public void showPickupDialog(){
+        tts("Please tap the screen to confirm you have picked up the item");
+        fr.show(getFragmentManager(),"Pickup");
 
     }
 
@@ -139,10 +139,12 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         Button speakCommand = (Button) findViewById(R.id.speakCommand);
         speakCommand.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                textToSpeech.stop();
-                displaySpeechRecognizer();
+//                textToSpeech.stop();
+//                displaySpeechRecognizer();
+                showPickupDialog();
             }
         });
+
 
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -151,7 +153,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                     textToSpeech.setLanguage(Locale.ENGLISH);
                     textToSpeech.setSpeechRate((float) 0.85);
                     String introMessage = "Welcome to SuperNavi! For instructions on how to use the app, please click on the speak button, which is a large button at the bottom right of the screen. Then say, Getting Started";
-                    textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
+                   // textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
                 }
             }
         });
@@ -207,17 +209,16 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         Log.d("Detector:",mDetector.toString());
 
-        PickUpItemFragment fr = new PickUpItemFragment();
-        fr.show(getFragmentManager(),"s");
-
         productSelection();
 
     }
 
 
 
-    // Override onCreate() and anything else you want
+    public void pickUpItem(View view){
 
+        fr.dismiss();
+    }
 
     //Handles product selection mode
     private void productSelection() {
@@ -286,8 +287,9 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                                                             if (responseString.endsWith("SIGNATURE")){
                                                                 responseString = responseString.replaceAll("SIGNATURE","");
                                                                 tts(responseString);
-                                                                onTap();
+                                                                showPickupDialog();
                                                             } else {
+                                                                fr.dismiss();
                                                                 tts(responseString);
                                                             }
                                                         } catch (JSONException e) {
@@ -633,17 +635,14 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     public static class PickUpItemFragment extends DialogFragment {
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage("Added item?")
-                    .setPositiveButton("Picked up", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.pickup_dialog, container);
+            getDialog().setTitle("Hello");
+
+            return view;
         }
+
     }
 
 
