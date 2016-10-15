@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.midas.supernavi.R.id.groceryList;
@@ -73,6 +74,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private List<Beacon> currentBeaconList;
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private GestureDetectorCompat mDetector;
+    private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private ScheduledFuture<?> lastFuture;
 
 
 
@@ -219,8 +222,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles product selection mode
     private void productSelection() {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
-        executor.shutdown();
-        executor = Executors.newScheduledThreadPool(1);
+        if(lastFuture != null)
+            lastFuture.cancel(true);
 
         Log.d("Mode", "Entering product selection mode");
         setTitle("SuperNavi - Product Selection");
@@ -307,7 +310,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                                 }
                             };
 
-                            executor.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+                            lastFuture = executor.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
                             Log.d("Response 1", response.toString());
 
                         }
@@ -349,8 +352,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles free roam mode
     private void freeRoam() {
         currentOperatingMode = OperatingMode.FREE_ROAM;
-        executor.shutdown();
-        executor = Executors.newScheduledThreadPool(1);
+        if(lastFuture != null)
+            lastFuture.cancel(true);
         Log.d("Mode", "Entering free roam mode");
         setTitle("SuperNavi - Free Roam");
         tts("free roam mode", true);
