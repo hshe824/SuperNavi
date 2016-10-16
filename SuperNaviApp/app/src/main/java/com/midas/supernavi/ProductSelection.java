@@ -75,7 +75,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private GestureDetectorCompat mDetector;
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> lastFuture;
-    private static PickUpItemFragment fr = new PickUpItemFragment();
+    private PickUpItemFragment fr;
 
 
     private static final int SPEECH_REQUEST_CODE = 0;
@@ -204,6 +204,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         Log.d("Detector:", mDetector.toString());
+
+        fr = new PickUpItemFragment();
 
         productSelection();
 
@@ -603,7 +605,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     //Creates grocery list
     private void populateListView() {
-        String[] groceries = {"soup"};
+        String[] groceries = {"banana","yoghurt"};
         gList = new ArrayList<String>(Arrays.asList(groceries));
 
         adapter = new ArrayAdapter<String>(this, R.layout.groceries, gList);
