@@ -115,7 +115,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     }
 
     public void showPickupDialog() {
-        tts("Please tap the screen to confirm you have picked up the item");
+        tts("Please tap the screen to confirm you have picked up the item",true);
         fr.show(getFragmentManager(), "Pickup");
 
     }
@@ -213,8 +213,10 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
 
     public void pickUpItem(View view) {
-
-        fr.dismiss();
+        if (fr!=null &&  fr.getDialog()!=null
+                && fr.getDialog().isShowing()) {
+            fr.dismiss();
+        }
     }
 
     //Handles product selection mode
@@ -306,7 +308,10 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                                                                 tts(responseString);
                                                                 showPickupDialog();
                                                             } else {
-                                                                fr.dismiss();
+                                                                if (fr!=null &&  fr.getDialog()!=null
+                                                                        && fr.getDialog().isShowing()){
+                                                                    fr.dismiss();
+                                                                }
                                                                 tts(responseString);
                                                             }
                                                         } catch (JSONException e) {
