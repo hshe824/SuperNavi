@@ -247,7 +247,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     }
 
-    private String sendGetRequest() {
+    private void sendGetRequest() {
         final String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
                 Secure.ANDROID_ID);
         final Gson gson = new Gson();
