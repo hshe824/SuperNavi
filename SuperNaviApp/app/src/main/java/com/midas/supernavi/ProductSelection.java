@@ -76,10 +76,9 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private List<Beacon> currentBeaconList;
     private GestureDetectorCompat mDetector;
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    private ScheduledFuture<?> lastFuture;
     private PickUpItemFragment fr;
     private Vibrator vibrator;
-
+    private Boolean isSendingBeaconData = false;
 
     private static final int SPEECH_REQUEST_CODE = 0;
 
@@ -202,7 +201,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         beaconManager = BeaconManager.getInstanceForApplication(getApplicationContext());
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.setForegroundBetweenScanPeriod(0l);
-        beaconManager.setForegroundScanPeriod(5000l);
+        beaconManager.setForegroundScanPeriod(625l);
         beaconManager.bind(this);
 
         requestQueue = Volley.newRequestQueue(this);
@@ -228,8 +227,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles product selection mode
     private void productSelection() {
         currentOperatingMode = OperatingMode.PRODUCT_SELECTION;
-        if (lastFuture != null)
-            lastFuture.cancel(true);
+        isSendingBeaconData = false;
 
         Log.d("Mode", "Entering product selection mode");
         setTitle("SuperNavi - Product Selection");
@@ -297,51 +295,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                         @Override
                         public void onResponse(JSONObject response) {
                             Log.d("hi", "hi");
-                            Runnable runnable = new Runnable() {
-                                public void run() {
-                                    String url1 = "http://supernavibeaconapi.azurewebsites.net/api/navigation/" + android_id;
-                                    JSONObject jsonObject1 = new JSONObject();
-                                    try {
-                                        jsonObject1.put("beacons", new JSONArray(gson.toJson(toDtoBeaconList(currentBeaconList))));
-                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                                                (Request.Method.POST, url1, jsonObject1, new Response.Listener<JSONObject>() {
-                                                    @Override
-                                                    public void onResponse(JSONObject response) {
-                                                        try {
-                                                            String responseString = response.getString("str");
-                                                            if (responseString.endsWith("SIGNATURE")) {
-                                                                responseString = responseString.replaceAll("SIGNATURE", "");
-                                                                tts(responseString);
-                                                                showPickupDialog();
-                                                            } else {
-//                                                                if (fr!=null &&  fr.getDialog()!=null
-//                                                                        && fr.getDialog().isShowing()){
-//                                                                    fr.dismiss();
-//                                                                }
-                                                                tts(responseString);
-                                                            }
-                                                        } catch (JSONException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                        Log.d("Response 2", response.toString());
-                                                    }
-                                                }, new Response.ErrorListener() {
-                                                    @Override
-                                                    public void onErrorResponse(VolleyError error) {
-
-                                                    }
-                                                });
-
-                                        Log.d("Request 2", jsonObject1.toString());
-                                        requestQueue.add(jsonObjectRequest);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            };
-                            if(lastFuture != null)
-                                lastFuture.cancel(true);
-                            lastFuture = executor.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
+                            isSendingBeaconData = true;
                             Log.d("Response 1", response.toString());
 
                         }
@@ -370,6 +324,48 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         return list;
     }
 
+    private void sendBeaconData(){
+
+        Gson gson = new Gson();
+        final String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
+                Secure.ANDROID_ID);
+
+        String url1 = "http://supernavibeaconapi.azurewebsites.net/api/navigation/" + android_id;
+        JSONObject jsonObject1 = new JSONObject();
+        try {
+            jsonObject1.put("beacons", new JSONArray(gson.toJson(toDtoBeaconList(currentBeaconList))));
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                    (Request.Method.POST, url1, jsonObject1, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String responseString = response.getString("str");
+                                if (responseString.endsWith("SIGNATURE")) {
+                                    responseString = responseString.replaceAll("SIGNATURE", "");
+                                    tts(responseString);
+                                    showPickupDialog();
+                                } else {
+                                    tts(responseString);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            Log.d("Response 2", response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    });
+
+            Log.d("Request 2", jsonObject1.toString());
+            requestQueue.add(jsonObjectRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private List<DtoItem> sanitiseList() {
         ArrayList<DtoItem> dtoList = new ArrayList<DtoItem>();
         for (String item : gList) {
@@ -383,8 +379,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     //Handles free roam mode
     private void freeRoam() {
         currentOperatingMode = OperatingMode.FREE_ROAM;
-        if (lastFuture != null)
-            lastFuture.cancel(true);
+        isSendingBeaconData = false;
         Log.d("Mode", "Entering free roam mode");
         setTitle("SuperNavi - Free Roam");
         tts("free roam mode", true);
@@ -462,7 +457,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
             }
         } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
             tts("Cannot add or delete in this mode, please change to product selection mode", true);
-        } else if (currentOperatingMode == OperatingMode.FREE_ROAM && matches.contains("whats here")) {
+        } else if (currentOperatingMode == OperatingMode.FREE_ROAM && matches.contains("near me")) {
             freeRoamQuery();
         } else {
             tts("Sorry, I could not recognise that last command, please try again", true);
@@ -480,7 +475,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         }
         final Gson gson = new Gson();
 
-        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/item/" + android_id;
+        String url = "http://supernavibeaconapi.azurewebsites.net/api/navigation/freeroam/" + android_id;
         JSONObject jsonObject1 = new JSONObject();
         try {
             jsonObject1.put("beacons", new JSONArray(gson.toJson(toDtoBeaconList(currentBeaconList))));
@@ -499,7 +494,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-
+                            Log.e("Error: ", error.toString());
                         }
                     });
             requestQueue.add(jsonObjectRequest);
@@ -659,9 +654,15 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
-                Log.d("", "Count: " + collection.size());
+                Log.d("Count", "" + collection.size());
 
                 currentBeaconList = new ArrayList<>(collection);
+
+                if(isSendingBeaconData){
+                    sendBeaconData();
+                }
+
+                Log.d("HI", "HI");
             }
         });
 
