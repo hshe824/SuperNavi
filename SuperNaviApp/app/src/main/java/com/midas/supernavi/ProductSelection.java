@@ -2,10 +2,12 @@ package com.midas.supernavi;
 
 import android.Manifest;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.os.Vibrator;
 import android.provider.Settings.Secure;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
@@ -76,6 +78,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> lastFuture;
     private PickUpItemFragment fr;
+    private Vibrator vibrator;
 
 
     private static final int SPEECH_REQUEST_CODE = 0;
@@ -118,6 +121,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         tts("Please tap the screen to confirm you have picked up the item",true);
         if ( fr.getDialog()==null || !fr.getDialog().isShowing()) {
             fr.show(getFragmentManager(), "Pickup");
+            vibrate();
         }
     }
 
@@ -607,6 +611,12 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         } else {
             tts("Your shopping list does not contain " + grocery);
         }
+    }
+
+    private void vibrate(){
+        vibrator = (Vibrator) this.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+        //Vibrate for 500ms
+        vibrator.vibrate(500);
     }
 
 
