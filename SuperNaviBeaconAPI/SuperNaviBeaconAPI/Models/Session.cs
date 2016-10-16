@@ -179,7 +179,7 @@ namespace SuperNaviBeaconAPI.Models
             if (travelPath.Count < 2)
             {
                 prevCommandTime = DateTime.Now;
-                return ("Welcome to " + supermarket.name + ". Proceed by walking to the right.");
+                return ("Welcome to " + supermarket.name + ". Take a step forward please.");
             }
 
             Point current = travelPath[travelPath.Count - 1];
