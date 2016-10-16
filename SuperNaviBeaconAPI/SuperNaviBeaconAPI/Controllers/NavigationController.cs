@@ -26,7 +26,7 @@ namespace SuperNaviBeaconAPI.Controllers
         [HttpPost]
         public DtoString Freeroam(DtoBeaconList list, String phoneID)
         {
-            if (!connections.Keys.Contains(phoneID)) {
+            if (!connections.ContainsKey(phoneID)) {
                 DtoItemList emptyList = new DtoItemList()
                 {
                     shoppingList = new List<DtoItem>(),
@@ -37,7 +37,15 @@ namespace SuperNaviBeaconAPI.Controllers
             }
 
             Session retrieved = connections[phoneID];
-            return new DtoString(retrieved.getNearbyItems(list));
+            retrieved.UpdateNewPosition(list.beacons);
+
+            Point last = new Point() { X = 0, Y = 0 };
+            if (retrieved.travelPath.Count > 0)
+            {
+                last = retrieved.getLast();
+            }
+
+            return new DtoString(retrieved.getNearbyItems(list)) { coord = "X:" + last.X + " Y:" + last.Y};
         }
 
 
@@ -91,7 +99,12 @@ namespace SuperNaviBeaconAPI.Controllers
                     Right
             */
             String direction = session.GetDirection();
-            return new DtoString(direction);
+            Point last = new Point() { X=0,Y=0};
+            if (session.travelPath.Count >0) {
+                last = session.getLast();
+            }
+
+            return new DtoString(direction) { coord = "X:" + last.X + " Y:" + last.Y};
         }
 
         // DELETE api/Navigation/reset

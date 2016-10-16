@@ -13,5 +13,7 @@ namespace SuperNaviBeaconAPI.Models
         }
 
         public String str { get; set; }
+
+        public String coord { get; set; }
     }
 }
