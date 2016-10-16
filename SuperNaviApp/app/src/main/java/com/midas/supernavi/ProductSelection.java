@@ -339,7 +339,8 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                                     }
                                 }
                             };
-
+                            if(lastFuture != null)
+                                lastFuture.cancel(true);
                             lastFuture = executor.scheduleAtFixedRate(runnable, 0, 3, TimeUnit.SECONDS);
                             Log.d("Response 1", response.toString());
 
