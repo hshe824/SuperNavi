@@ -218,6 +218,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                 && fr.getDialog().isShowing()) {
             fr.dismiss();
         }
+        sendGetRequest();
     }
 
     //Handles product selection mode
@@ -246,7 +247,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     }
 
-    private void sendGetRequest(String route) {
+    private String sendGetRequest() {
         final String android_id = Secure.getString(this.getApplicationContext().getContentResolver(),
                 Secure.ANDROID_ID);
         final Gson gson = new Gson();
@@ -309,10 +310,10 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                                                                 tts(responseString);
                                                                 showPickupDialog();
                                                             } else {
-                                                                if (fr!=null &&  fr.getDialog()!=null
-                                                                        && fr.getDialog().isShowing()){
-                                                                    fr.dismiss();
-                                                                }
+//                                                                if (fr!=null &&  fr.getDialog()!=null
+//                                                                        && fr.getDialog().isShowing()){
+//                                                                    fr.dismiss();
+//                                                                }
                                                                 tts(responseString);
                                                             }
                                                         } catch (JSONException e) {
