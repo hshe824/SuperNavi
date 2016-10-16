@@ -7,11 +7,13 @@ package com.midas.supernavi.Models;
 
 public class DtoItem
 {
-    public DtoItem() { }
+    public DtoItem(String name) {
+        this.name=name;
+    }
     public String name;
-    public String supermarket ;
-    public int positionX = 0;
-    public int positionY = 0;
+    public String supermarket;
+    public int positionX;
+    public int positionY;
     public String side;
-    
+
 }

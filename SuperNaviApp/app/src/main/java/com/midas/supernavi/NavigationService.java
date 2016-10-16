@@ -67,7 +67,7 @@ public class NavigationService extends Service implements BeaconConsumer  {
     @Override
     public void onBeaconServiceConnect() {
 
-        beaconManager.addRangeNotifier(new RangeNotifier() {
+        beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> collection, Region region) {
                 Iterator<Beacon> iterator = collection.iterator();
