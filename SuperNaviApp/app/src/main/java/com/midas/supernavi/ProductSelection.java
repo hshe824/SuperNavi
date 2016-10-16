@@ -442,14 +442,14 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         } else if (matches.contains("getting started")) {
             tts("There is a mode slider along the left edge of the screen. Drag this to change modes. The large speak command button is at the bottom right of the screen, click on this and say a command. Say help to get info on these commands for each mode", true);
         } else if (currentOperatingMode == OperatingMode.PRODUCT_SELECTION) {
-            if (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add")) {
+            if (addOrDelete[0].equals("ad") || addOrDelete[0].equals("add")|| addOrDelete[0].equals("insert")) {
                 addItem(addOrDelete);
             } else if (addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
                 deleteItem(addOrDelete);
             } else {
                 tts("Sorry, I could not recognise that last command, please try again", true);
             }
-        } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
+        } else if (currentOperatingMode != OperatingMode.PRODUCT_SELECTION && addOrDelete[0].equals("ad") || addOrDelete[0].equals("add") || addOrDelete[0].equals("insert") || addOrDelete[0].equals("remove") || addOrDelete[0].equals("delete")) {
             tts("Cannot add or delete in this mode, please change to product selection mode", true);
         } else if (currentOperatingMode == OperatingMode.FREE_ROAM && matches.contains("near me")) {
             freeRoamQuery();
