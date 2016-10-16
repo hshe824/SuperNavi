@@ -90,7 +90,8 @@ namespace SuperNaviBeaconAPI.Controllers
                     Left
                     Right
             */
-            return new DtoString(session.GetDirection());
+            String direction = session.GetDirection();
+            return new DtoString(direction);
         }
 
         // DELETE api/Navigation/reset
