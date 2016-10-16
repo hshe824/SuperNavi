@@ -321,7 +321,7 @@ namespace SuperNaviBeaconAPI.Models
                     absDir = 270;
                 }
                 //Other wise walk to end of aisles
-                else if ((current.Y) < 5)
+                else if ((current.Y) < 3)
                 {
                     absDir = 180;
                 }
@@ -338,13 +338,13 @@ namespace SuperNaviBeaconAPI.Models
         //Populating map containing the relative direction to the associated command
         private void populateRelativeMap() {
             relativeDirectionMap.Add(0, "Keep Going Straight.");
-            relativeDirectionMap.Add(90, "Turn Right.");
-            relativeDirectionMap.Add(180, "Turn Around.");
-            relativeDirectionMap.Add(270, "Turn Left.");
-            relativeDirectionMap.Add(360, "Keep Going Straight.");
-            relativeDirectionMap.Add(-90, "Turn Left.");
-            relativeDirectionMap.Add(-180, "Turn Around.");
-            relativeDirectionMap.Add(-270, "Turn Right.");
+            relativeDirectionMap.Add(90, "Turn Right and walk.");
+            relativeDirectionMap.Add(180, "Turn Around and walk.");
+            relativeDirectionMap.Add(270, "Turn Left and walk.");
+            relativeDirectionMap.Add(360, "Keep Going Straight and walk.");
+            relativeDirectionMap.Add(-90, "Turn Left and walk.");
+            relativeDirectionMap.Add(-180, "Turn Around and walk.");
+            relativeDirectionMap.Add(-270, "Turn Right and walk.");
         }
     }
 }
