@@ -56,8 +56,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import static com.midas.supernavi.R.id.groceryList;
 
@@ -151,7 +149,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
                     textToSpeech.setLanguage(Locale.ENGLISH);
                     textToSpeech.setSpeechRate((float) 0.85);
                     String introMessage = "Welcome to SuperNavi! For instructions on how to use the app, please click on the speak button, which is a large button at the bottom right of the screen. Then say, Getting Started";
-                    // textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
+                    textToSpeech.speak(introMessage, TextToSpeech.QUEUE_FLUSH, null, null);
                 }
             }
         });
