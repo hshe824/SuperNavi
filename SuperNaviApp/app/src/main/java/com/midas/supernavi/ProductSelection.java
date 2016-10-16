@@ -17,11 +17,9 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -206,9 +204,7 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         beaconManager.bind(this);
 
         requestQueue = Volley.newRequestQueue(this);
-
-        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
-        Log.d("Detector:", mDetector.toString());
+        
 
         fr = new PickUpItemFragment();
 
@@ -672,41 +668,6 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        this.mDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-
-    }
-
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final String DEBUG_TAG = "Gestures";
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            Log.d(DEBUG_TAG, "onDown: " + event.toString());
-            return true;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2,
-                               float velocityX, float velocityY) {
-            Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
-            return true;
-        }
-
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent event) {
-            tts("Tapped");
-            return true;
-        }
-
-        @Override
-        public boolean onDoubleTap(MotionEvent event) {
-            tts("Tapped");
-            return true;
-        }
-    }
 
     public static class PickUpItemFragment extends DialogFragment {
         @Override
