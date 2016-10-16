@@ -26,7 +26,7 @@ namespace SuperNaviBeaconAPI.Controllers
         [HttpPost]
         public DtoString Freeroam(DtoBeaconList list, String phoneID)
         {
-            if (!connections.Keys.Contains(phoneID)) {
+            if (!connections.ContainsKey(phoneID)) {
                 DtoItemList emptyList = new DtoItemList()
                 {
                     shoppingList = new List<DtoItem>(),
