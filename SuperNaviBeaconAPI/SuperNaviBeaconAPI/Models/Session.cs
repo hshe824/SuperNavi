@@ -346,5 +346,9 @@ namespace SuperNaviBeaconAPI.Models
             relativeDirectionMap.Add(-180, "Turn Around and walk.");
             relativeDirectionMap.Add(-270, "Turn Right and walk.");
         }
+
+        internal Point getLast() {
+            return travelPath[travelPath.Count - 1];
+        }
     }
 }

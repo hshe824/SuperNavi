@@ -37,7 +37,8 @@ namespace SuperNaviBeaconAPI.Controllers
             }
 
             Session retrieved = connections[phoneID];
-            return new DtoString(retrieved.getNearbyItems(list));
+            Point p = retrieved.getLast();
+            return new DtoString(retrieved.getNearbyItems(list)) { coord = "X:" + p.X + " Y:" + p.Y};
         }
 
 
@@ -91,7 +92,8 @@ namespace SuperNaviBeaconAPI.Controllers
                     Right
             */
             String direction = session.GetDirection();
-            return new DtoString(direction);
+            Point last = session.getLast();
+            return new DtoString(direction) { coord = "X:" + last.X + " Y:" + last.Y};
         }
 
         // DELETE api/Navigation/reset
