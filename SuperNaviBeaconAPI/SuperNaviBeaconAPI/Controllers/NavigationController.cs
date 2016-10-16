@@ -37,6 +37,8 @@ namespace SuperNaviBeaconAPI.Controllers
             }
 
             Session retrieved = connections[phoneID];
+            retrieved.UpdateNewPosition(list.beacons);
+
             Point last = new Point() { X = 0, Y = 0 };
             if (retrieved.travelPath.Count > 0)
             {
