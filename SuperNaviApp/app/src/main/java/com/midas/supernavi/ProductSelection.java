@@ -116,8 +116,9 @@ public class ProductSelection extends AppCompatActivity implements BeaconConsume
 
     public void showPickupDialog() {
         tts("Please tap the screen to confirm you have picked up the item",true);
-        fr.show(getFragmentManager(), "Pickup");
-
+        if ( fr.getDialog()==null || !fr.getDialog().isShowing()) {
+            fr.show(getFragmentManager(), "Pickup");
+        }
     }
 
 
