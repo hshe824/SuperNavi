@@ -37,8 +37,13 @@ namespace SuperNaviBeaconAPI.Controllers
             }
 
             Session retrieved = connections[phoneID];
-            Point p = retrieved.getLast();
-            return new DtoString(retrieved.getNearbyItems(list)) { coord = "X:" + p.X + " Y:" + p.Y};
+            Point last = new Point() { X = 0, Y = 0 };
+            if (retrieved.getLast() != null)
+            {
+                last = retrieved.getLast();
+            }
+
+            return new DtoString(retrieved.getNearbyItems(list)) { coord = "X:" + last.X + " Y:" + last.Y};
         }
 
 
@@ -92,7 +97,11 @@ namespace SuperNaviBeaconAPI.Controllers
                     Right
             */
             String direction = session.GetDirection();
-            Point last = session.getLast();
+            Point last = new Point() { X=0,Y=0};
+            if (session.getLast() != null) {
+                last = session.getLast();
+            }
+
             return new DtoString(direction) { coord = "X:" + last.X + " Y:" + last.Y};
         }
 
