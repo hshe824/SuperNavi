@@ -17,7 +17,7 @@ namespace SuperNaviBeaconAPI.Models
         //the direction the user is facing
         private int Direction = 0;
         //Maintains a list of the points travelled
-        private List<Point> travelPath = new List<Point>();
+        internal List<Point> travelPath = new List<Point>();
 
         //Mapping targets to points
         public Dictionary<Item, Point> targets = new Dictionary<Item, Point>();

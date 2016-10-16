@@ -38,7 +38,7 @@ namespace SuperNaviBeaconAPI.Controllers
 
             Session retrieved = connections[phoneID];
             Point last = new Point() { X = 0, Y = 0 };
-            if (retrieved.getLast() != null)
+            if (retrieved.travelPath.Count > 0)
             {
                 last = retrieved.getLast();
             }
@@ -98,7 +98,7 @@ namespace SuperNaviBeaconAPI.Controllers
             */
             String direction = session.GetDirection();
             Point last = new Point() { X=0,Y=0};
-            if (session.getLast() != null) {
+            if (session.travelPath.Count >0) {
                 last = session.getLast();
             }
 
