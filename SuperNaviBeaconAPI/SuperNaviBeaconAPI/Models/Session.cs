@@ -230,14 +230,14 @@ namespace SuperNaviBeaconAPI.Models
             UpdateNewPosition(list.beacons);
 
             Point currentPos = travelPath[travelPath.Count - 1];
+            List<Item> LEFTItems = new List<Item>();
+            List<Item> RIGHTItems = new List<Item>();
 
-            Boolean isLeft = false;
             //Getting all the items next to the users current position;
             foreach(Item i in supermarketItems){
                 int offset = 1;
                 if (i.side.ToLower().Equals("left")) {
                     offset = -1;
-                    isLeft = true;
                 }
 
                 Point p = new Point()
@@ -247,23 +247,50 @@ namespace SuperNaviBeaconAPI.Models
                 };
 
                 if (p.Equals(currentPos)) {
-                    reply.Append(i.name + ", ");
+                    if (i.side.ToLower().Equals("left"))
+                    {
+                        LEFTItems.Add(i);
+                    }
+                    else {
+                        RIGHTItems.Add(i);
+                    }
                 }
             }
 
-            if (reply.ToString() == null || reply.ToString().Equals("")) {
+            if (LEFTItems.Count + RIGHTItems.Count == 0) {
                 return "there are no items right next to you currently";
             }
 
-            reply.Append("is on the ");
-            if ((isLeft && Direction == 0) || (!isLeft && Direction == 180))
-            {
-                reply.Append("right.");
+            foreach(Item i in LEFTItems){
+                reply.Append(i.name + ", ");
             }
-            else
-            {
-                reply.Append("left.");
+            if (LEFTItems.Count > 0) {
+                reply.Append("can be found on the ");
+                if (Direction == 0)
+                {
+                    reply.Append("right. ");
+                }
+                else {
+                    reply.Append("left. ");
+                }
+
             }
+
+            foreach (Item i in RIGHTItems) {
+                reply.Append(i.name + ", ");
+            }
+            if (RIGHTItems.Count > 0) {
+                reply.Append("can be found on the ");
+                if (Direction == 0)
+                {
+                    reply.Append("left.");
+                }
+                else
+                {
+                    reply.Append("right.");
+                }
+            }
+
 
             return reply.ToString();
         }
