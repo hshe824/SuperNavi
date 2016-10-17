@@ -10,27 +10,27 @@ namespace SuperNaviBeaconAPI.Models
         public String name { get; set; }
         public List<Beacon> allBeaconData { get; set; }
 
+        public Point exit { get; set; }
+        public Point entry { get; set; }
+
         /**
             Key: Point with X and Y
             Value: List of all beacon data for that Point
         */
         private Dictionary<Point, List<Beacon>> map = new Dictionary<Point, List<Beacon>>();
 
-        public Supermarket()
-        {
-            SetUp();
-        }
+        public Supermarket() {}
 
         /**
             Setup all the points and the beacon data into the dictionary
         */
         public void SetUp()
         {
-            for(int x = 0; x < 10; x++)
+            for(int x = 0; x < 5; x++)
             {
-                for(int y = 0; y < 10; y++)
+                for(int y = 0; y < 5; y++)
                 {
-                    if (x % 3 != 2 || y == 0 || y == 10)
+                    if (x % 2 != 0 || y == 0 || y == 4)
                         map[new Point()
                         {
                             X = x,
@@ -51,11 +51,16 @@ namespace SuperNaviBeaconAPI.Models
 
             foreach(Beacon beacon in allBeaconData)
             {
-                map[new Point()
+                try {
+                    map[new Point()
+                    {
+                        X = beacon.positionX,
+                        Y = beacon.positionY,
+                    }].Add(beacon);
+                } catch(Exception e)
                 {
-                    X = beacon.positionX,
-                    Y = beacon.positionY,
-                }].Add(beacon);
+                    var x = 1 + 1;
+                }
             }
         }
 
@@ -69,6 +74,19 @@ namespace SuperNaviBeaconAPI.Models
                 X = x,
                 Y = y,
             }];
+        }
+
+        public Boolean isWalkable(int x, int y)
+        {
+            Point temp = new Point() { X = x, Y = y };
+            foreach (Point p in map.Keys)
+            {
+                if (p.Equals(temp))
+                {
+                    return p.walkable;
+                }
+            }
+            return false;
         }
     }
 }

@@ -9,7 +9,6 @@ using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-
 namespace SuperNaviBeaconAPI.Controllers
 {
     public class NavigationController : ApiController
@@ -23,33 +22,43 @@ namespace SuperNaviBeaconAPI.Controllers
         private CloudTable itemTable = CloudStorageAccount.Parse(
             CloudConfigurationManager.GetSetting("StorageConnectionString")).CreateCloudTableClient().GetTableReference("Item");
 
-        // GET api/Navigation
-        public IEnumerable<string> Get()
+        [Route("~/api/Navigation/freeroam/{phoneID}")]
+        [HttpPost]
+        public DtoString Freeroam(DtoBeaconList list, String phoneID)
         {
-            return new string[] {};
-        }
-
-        // GET api/Navigation/5
-        public string Get(DtoBeacon beacon)
-        {
-            return "value";
-        }
-
-        //Post api/Navigation
-        public String Post(DtoBeacon beacon)
-        {
-            //Get the name of the supermarket with one of the beacons
-            TableQuery<Beacon> query = new TableQuery<Beacon>();
-            foreach(Beacon entity in beaconTable.ExecuteQuery(query))
-            {
-                if(entity.majorid == beacon.majorid &&
-                   entity.minorid == beacon.minorid &&
-                   entity.uuid == beacon.uuid)
+            if (!connections.ContainsKey(phoneID)) {
+                DtoItemList emptyList = new DtoItemList()
                 {
-                    return entity.supermarket;
-                }
+                    shoppingList = new List<DtoItem>(),
+                    beacon = list.beacons[0],
+                };
+
+                connections.Add(phoneID, generateSession(emptyList, phoneID));
             }
-            return "Supermarket not found";
+
+            Session retrieved = connections[phoneID];
+            retrieved.UpdateNewPosition(list.beacons);
+
+            Point last = new Point() { X = 0, Y = 0 };
+            if (retrieved.travelPath.Count > 0)
+            {
+                last = retrieved.getLast();
+            }
+
+            return new DtoString(retrieved.getNearbyItems(list)) { coord = "X:" + last.X + " Y:" + last.Y};
+        }
+
+
+        // GET api/Navigation/retrieved
+        [Route("api/navigation/retrieved/{phoneID}")]
+        [HttpGet]
+        public String RetrievedItem(String phoneID)
+        {
+            Session session = connections[phoneID];
+
+            String command = session.collectedItem();
+
+            return command;
         }
 
         //POST api.Navigation
@@ -59,10 +68,68 @@ namespace SuperNaviBeaconAPI.Controllers
             Pass in the items that needs to be picked up as well as the supermarket name
             Session is created
         */
-        public HttpStatusCode Post(List<DtoItem> items, String supermarketName, String phoneID)
+        [Route("~/api/navigation/item/{phoneID}")]
+        public DtoItem Post(DtoItemList list, String phoneID)
         {
-            //Get IP Address
+            
+            //Store the session
+            connections[phoneID] = generateSession(list, phoneID);
+
+            return new DtoItem();
+        }
+
+        // POST api/Navigation
+        /*
+            Get the direction given the current position
+        */
+        [Route("~/api/navigation/{phoneID}")]
+        public DtoString Post(DtoBeaconList list, String phoneID)
+        {
             String ipAddress = phoneID;
+            //Retrieve session with IP Address
+            Session session = connections[ipAddress];
+            
+            //Update position with the new client beacon data
+            session.UpdateNewPosition(list.beacons);
+
+            //Get direction to go to
+            /*
+                    Straight
+                    Left
+                    Right
+            */
+            String direction = session.GetDirection();
+            Point last = new Point() { X=0,Y=0};
+            if (session.travelPath.Count >0) {
+                last = session.getLast();
+            }
+
+            return new DtoString(direction) { coord = "X:" + last.X + " Y:" + last.Y};
+        }
+
+        // DELETE api/Navigation/reset
+        [HttpDelete]
+        [Route("api/navigation/reset")]
+        public void Reset()
+        {
+            connections.Clear();
+        }
+
+        private Session generateSession(DtoItemList list, String phoneID)
+        {
+            String supermarketName = "";
+
+            //Get the name of the supermarket with one of the beacons
+            TableQuery<Beacon> supermarketQuery = new TableQuery<Beacon>();
+            foreach (Beacon entity in beaconTable.ExecuteQuery(supermarketQuery))
+            {
+                if (entity.majorid == list.beacon.majorid &&
+                   entity.minorid == list.beacon.minorid &&
+                   entity.uuid == list.beacon.uuid)
+                {
+                    supermarketName = entity.supermarket;
+                }
+            }
 
             //Get all beacon data for the supermarket
             TableQuery<Beacon> query = new TableQuery<Beacon>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarketName));
@@ -74,52 +141,19 @@ namespace SuperNaviBeaconAPI.Controllers
             {
                 name = supermarketName,
                 allBeaconData = allBeaconData,
+                exit = new Point() { X = 4, Y = 0 },
             };
+
+            supermarket.SetUp();
 
             //Getting all items from the supermarket
             List<Item> supermarketItems = new List<Item>();
             TableQuery<Item> queryItems = new TableQuery<Item>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, supermarket.name));
-            foreach (Item item in itemTable.ExecuteQuery(queryItems)) {supermarketItems.Add(item);}
+            foreach (Item item in itemTable.ExecuteQuery(queryItems)) { supermarketItems.Add(item); }
 
             //Make the session
-            Session session = new Session(items, supermarket, supermarketItems);
-            
-            //Store the session
-            connections[ipAddress] = session;
-
-            return HttpStatusCode.OK;
-        }
-
-        // POST api/Navigation
-        /*
-            Get the direction given the current position
-        */
-        public String Post(List<DtoBeacon> beacons, String phoneID)
-        {
-            String ipAddress = phoneID;
-            //Retrieve session with IP Address
-            Session session = connections[ipAddress];
-            
-            //Update position with the new client beacon data
-            session.UpdateNewPosition(beacons);
-
-            //Get direction to go to
-            /*
-                    Straight
-                    Left
-                    Right
-            */
-            return session.GetDirection();
-        }
-
-        // PUT api/Navigation/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/Navigation/5
-        public void Delete(int id)
-        {
+            return new Session(list.shoppingList, supermarket, supermarketItems);
         }
     }
+
 }

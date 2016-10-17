@@ -27,4 +27,9 @@ namespace SuperNaviBeaconAPI.Models
             return beacon;
         }
     }
+
+    public class DtoBeaconList
+    {
+        public List<DtoBeacon> beacons { get; set; }
+    }
 }

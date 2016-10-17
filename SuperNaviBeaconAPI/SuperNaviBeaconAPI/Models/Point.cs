@@ -11,5 +11,16 @@ namespace SuperNaviBeaconAPI.Models
         public int Y { get; set; }
         public int Score { get; set; }
         public Boolean walkable { get; set; }
+
+        public override int GetHashCode()
+        {
+            return X * 31 + Y;
+        }
+
+        public override bool Equals(object obj)
+        {
+            Point localPoint = obj as Point;
+            return (X == localPoint.X && Y == localPoint.Y);
+        }
     }
 }

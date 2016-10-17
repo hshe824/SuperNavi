@@ -25,7 +25,7 @@ namespace SuperNaviBeaconAPI.Models
         public int positionX { get; set; }
         public int positionY { get; set; }
         
-        public Side side { get; set; }
+        public String side { get; set; }
 
         public DtoItem ToDto()
         {
@@ -35,12 +35,8 @@ namespace SuperNaviBeaconAPI.Models
                 supermarket = this.supermarket,
                 positionX = this.positionX,
                 positionY = this.positionY,
-                side = this.side.ToString(),
+                side = this.side,
             };
-        }
-
-        public enum Side {
-            LEFT,RIGHT
         }
     }
 }

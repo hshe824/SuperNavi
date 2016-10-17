@@ -17,12 +17,12 @@ namespace SuperNaviBeaconAPI.Models
         //the direction the user is facing
         private int Direction = 0;
         //Maintains a list of the points travelled
-        private List<Point> travelPath = new List<Point>();
+        internal List<Point> travelPath = new List<Point>();
 
         //Mapping targets to points
         public Dictionary<Item, Point> targets = new Dictionary<Item, Point>();
         public Point currentTarget = new Point();
-
+        public Boolean shoppingComplete = false;
         //List of grocery items from the user
         private List<Item> groceryList = new List<Item>();
         //List of all grocery items
@@ -37,6 +37,7 @@ namespace SuperNaviBeaconAPI.Models
         private Dictionary<int, string> relativeDirectionMap = new Dictionary<int, string>();
 
         private String prevCommand;
+        private DateTime prevCommandTime = DateTime.Now;
 
         /**
             Update the current position given the new beacon data
@@ -56,19 +57,36 @@ namespace SuperNaviBeaconAPI.Models
                 }
             }
 
-            orderGroceries();
-            generateTargetPoints();
+            if (groc.Count > 0) {
+                orderGroceries();
+                generateTargetPoints();
+            }
         }
 
         //Use this to indicate the item was collected
-        public void collectedItem() {
+        public String collectedItem() {
+            StringBuilder command = new StringBuilder();
             groceryList.RemoveAt(0);
-            currentTarget = targets[groceryList[0]];
+            if (groceryList.Count == 0)
+            {
+                currentTarget = supermarket.exit;
+                command.Append("Now proceeding to checkout.");
+                shoppingComplete = true;
+            }
+            else {
+                currentTarget = targets[groceryList[0]];
+                command.Append("Now collecting " + groceryList[0].name);                
+                //ADD NEXT DIRECTION
+            }
+            prevCommandTime = DateTime.Now;
+            command.Append(calculatePath(travelPath[travelPath.Count - 1], currentTarget));
+            prevCommand = command.ToString();
+            return command.ToString();
         }
 
         //Ordering groceries to be listed by the row, side and depth on the row
         private void orderGroceries() {
-            var newList = groceryList.OrderBy(c => c.positionY).ThenBy(c => c.side).ThenBy(c => c.positionX);
+            var newList = groceryList.OrderBy(c => c.positionX).ThenByDescending(c => c.side).ThenBy(c => c.positionY);
             groceryList = newList.ToList();
         }
 
@@ -76,7 +94,7 @@ namespace SuperNaviBeaconAPI.Models
         private void generateTargetPoints() {
             foreach(Item item in groceryList) {
                 int offset = 1;
-                if (item.side == Item.Side.LEFT) {
+                if (item.side.ToLower().Equals("left")) {
                     offset = -1;
                 }
                 Point temp = new Point()
@@ -100,40 +118,44 @@ namespace SuperNaviBeaconAPI.Models
 
             //Go through each X and Y to see which point has the smallest difference in RSSI value of beacons
             //Could be further optimised to start from the last point and spread outwards
-            for(int x = 0; x < 10; x++)
+            for(int x = 0; x < 5; x++)
             {
-                for(int y = 0; y < 10; y++)
+                for(int y = 0; y < 5; y++)
                 {
                     //Get all beacon data at the position
                     List<Beacon> beaconsAtThatPosition = supermarket.GetBeaconDataAtPosition(x, y);
 
                     //Map it so we dont have to for loop twice
-                    Dictionary<String, Beacon> beaconsAtThatPositionMap = new Dictionary<String, Beacon>();
+                    Dictionary<String, DtoBeacon> challengeMap = new Dictionary<String, DtoBeacon>();
 
-                    foreach (Beacon beacon in beaconsAtThatPosition)
+                    foreach (DtoBeacon beacon in beacons)
                     {
-                        beaconsAtThatPositionMap[beacon.uuid + beacon.majorid + beacon.minorid] = beacon;
+                        challengeMap[beacon.uuid + beacon.majorid + beacon.minorid] = beacon;
                     }
 
                     int localScore = 0;
 
                     //For each beacon data client has just picked up
-                    foreach(DtoBeacon beaconChallenge in beacons)
+                    foreach(Beacon beacon in beaconsAtThatPosition)
                     {
-                        String key = beaconChallenge.uuid + beaconChallenge.majorid + beaconChallenge.minorid;
-                        //If the template had the beacon data
-                        if(beaconsAtThatPositionMap.ContainsKey(key))
+                        String key = beacon.uuid + beacon.majorid + beacon.minorid;
+                        //Calculate the difference using sum of squared differences
+                        DtoBeacon challengeBeacon;
+                        if (challengeMap.ContainsKey(key))
                         {
-                            //Calculate the difference using sum of squared differences
-                            Beacon beaconTemplate = beaconsAtThatPositionMap[key];
-                            localScore += (int)(Math.Pow(beaconChallenge.rssi, 2) - Math.Pow(beaconTemplate.rssi, 2));
+                            challengeBeacon = challengeMap[key];
                         }
                         else
                         {
-                            //If template didnt have it, punish the point as it is unlikely that it is this position
-                            localScore += 30;
+                            challengeBeacon = new DtoBeacon()
+                            {
+                                rssi = 0,
+                            };
                         }
+                        localScore += Math.Abs((int)(Math.Pow(beacon.rssi, 2) - Math.Pow(challengeBeacon.rssi, 2)));
+                        
                     }
+                    
 
                     //If the current score was less than the minimum so far, replace it
                     if(minimumDifferencePoint.Score > localScore)
@@ -153,32 +175,124 @@ namespace SuperNaviBeaconAPI.Models
 
         internal String GetDirection()
         {
-            StringBuilder command = new StringBuilder();
+            //must be first poll, get user to walk to right
+            if (travelPath.Count < 2)
+            {
+                prevCommandTime = DateTime.Now;
+                return ("Welcome to " + supermarket.name + ". Take a step forward please.");
+            }
 
             Point current = travelPath[travelPath.Count - 1];
 
-            //if at target alert them
-            if (current.X == currentTarget.X && current.Y == currentTarget.Y) {
-                command.Append(groceryList[0].name + " is on the ");
-                if ((groceryList[0].side == Item.Side.LEFT && Direction == 0 ) || (groceryList[0].side == Item.Side.RIGHT && Direction == 180))
-                {
-                    command.Append("right. ");
-                }
-                else {
-                    command.Append("left. ");
-                }
-
-                command.Append("Then ");
+            //If target is the exit, thank user for using app
+            if (shoppingComplete && current.Equals(currentTarget)) {
+                return ("Thank you for using SuperNavi! Hope you enjoyed this service.");
             }
+
+
+            StringBuilder command = new StringBuilder();
+
+            int prevOrientation = this.Direction;
 
             calcDirection();
-            command.Append(calculatePath(current, currentTarget));
 
-            if (command.ToString().Equals(prevCommand)) {
-                return "";
+            //if at target alert them
+            if (current.Equals(currentTarget)) {
+                command.Append(groceryList[0].name + " is on the ");
+                if ((groceryList[0].side.ToLower().Equals("left") && Direction == 0 ) || (groceryList[0].side.ToLower().Equals("right") && Direction == 180))
+                {
+                    command.Append("right. SIGNATURE");
+                }
+                else {
+                    command.Append("left.SIGNATURE");
+                }
+                prevCommand = command.ToString();
+                prevCommandTime = DateTime.Now;
+                return command.ToString();
             }
 
+
+            command.Append(calculatePath(current, currentTarget));
+            TimeSpan diff =  DateTime.Now.Subtract(prevCommandTime);
+
+            if (command.ToString().Equals(prevCommand) && prevOrientation == this.Direction && diff.TotalSeconds < 5) {
+                return "SAME";
+            }
+
+            prevCommandTime = DateTime.Now;
+            prevCommand = command.ToString();
             return command.ToString();
+        }
+
+        //Getting all the items right next to the current location of the user
+        internal String getNearbyItems(DtoBeaconList list) {
+            StringBuilder reply = new StringBuilder();
+            UpdateNewPosition(list.beacons);
+
+            Point currentPos = travelPath[travelPath.Count - 1];
+            List<Item> LEFTItems = new List<Item>();
+            List<Item> RIGHTItems = new List<Item>();
+
+            //Getting all the items next to the users current position;
+            foreach(Item i in supermarketItems){
+                int offset = 1;
+                if (i.side.ToLower().Equals("left")) {
+                    offset = -1;
+                }
+
+                Point p = new Point()
+                {
+                    X = i.positionX + offset,
+                    Y = i.positionY,
+                };
+
+                if (p.Equals(currentPos)) {
+                    if (i.side.ToLower().Equals("left"))
+                    {
+                        LEFTItems.Add(i);
+                    }
+                    else {
+                        RIGHTItems.Add(i);
+                    }
+                }
+            }
+
+            if (LEFTItems.Count + RIGHTItems.Count == 0) {
+                return "there are no items right next to you currently";
+            }
+
+            foreach(Item i in LEFTItems){
+                reply.Append(i.name + ", ");
+            }
+            if (LEFTItems.Count > 0) {
+                reply.Append("can be found on the ");
+                if (Direction == 0)
+                {
+                    reply.Append("right. ");
+                }
+                else {
+                    reply.Append("left. ");
+                }
+
+            }
+
+            foreach (Item i in RIGHTItems) {
+                reply.Append(i.name + ", ");
+            }
+            if (RIGHTItems.Count > 0) {
+                reply.Append("can be found on the ");
+                if (Direction == 0)
+                {
+                    reply.Append("left.");
+                }
+                else
+                {
+                    reply.Append("right.");
+                }
+            }
+
+
+            return reply.ToString();
         }
 
         //Calculating the direction user is facing from current point relative to next point
@@ -186,7 +300,7 @@ namespace SuperNaviBeaconAPI.Models
             Point current = travelPath[travelPath.Count - 1];
             Point prev = travelPath[travelPath.Count - 2];
 
-            if (current.X == prev.X && current.Y == prev.Y) {
+            if (current.Equals(prev)) {
                 return;
             }
 
@@ -207,6 +321,7 @@ namespace SuperNaviBeaconAPI.Models
             }
         }
 
+        //Calculating the path to take next
         private string calculatePath(Point current, Point end)
         {
             int absDir = 0;
@@ -221,42 +336,46 @@ namespace SuperNaviBeaconAPI.Models
                     absDir = 0;
                 }
             }
-            //Other wise walk to end of aisles
-            else if (current.Y != 0 || current.Y != 10)
+            else
             {
-                if ((current.Y - 0) > 5)
-                {
-                    absDir = 180;
-                }
-                else {
-                    absDir = 0;
-                }
-            }
-            //else walk to correct aisle
-            else {
-                if (current.X < currentTarget.X)
+                //walk left or right if no obstacle in the way
+                if (current.X < currentTarget.X && supermarket.isWalkable(current.X + 1, current.Y))
                 {
                     absDir = 90;
                 }
-                else {
+                else if (current.X > currentTarget.X && supermarket.isWalkable(current.X - 1, current.Y))
+                {
                     absDir = 270;
                 }
+                //Other wise walk to end of aisles
+                else if ((current.Y) < 3)
+                {
+                    absDir = 180;
+                }
+                else
+                {
+                    absDir = 0;
+                }
             }
-
+           
             String command = relativeDirectionMap[(absDir - Direction)];
             return command;
         }
 
+        //Populating map containing the relative direction to the associated command
         private void populateRelativeMap() {
             relativeDirectionMap.Add(0, "Keep Going Straight.");
-            relativeDirectionMap.Add(90, "Turn Left.");
-            relativeDirectionMap.Add(180, "Turn Around.");
-            relativeDirectionMap.Add(270, "Turn Right.");
-            relativeDirectionMap.Add(360, "Keep Going Straight.");
-            relativeDirectionMap.Add(-90, "Turn Left.");
-            relativeDirectionMap.Add(-180, "Turn Around.");
-            relativeDirectionMap.Add(-270, "Turn Right.");
+            relativeDirectionMap.Add(90, "Turn Right and walk.");
+            relativeDirectionMap.Add(180, "Turn Around and walk.");
+            relativeDirectionMap.Add(270, "Turn Left and walk.");
+            relativeDirectionMap.Add(360, "Keep Going Straight and walk.");
+            relativeDirectionMap.Add(-90, "Turn Left and walk.");
+            relativeDirectionMap.Add(-180, "Turn Around and walk.");
+            relativeDirectionMap.Add(-270, "Turn Right and walk.");
         }
 
+        internal Point getLast() {
+            return travelPath[travelPath.Count - 1];
+        }
     }
 }

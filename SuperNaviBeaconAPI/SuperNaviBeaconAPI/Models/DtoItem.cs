@@ -22,10 +22,16 @@ namespace SuperNaviBeaconAPI.Models
             {
                 positionX = this.positionX,
                 positionY = this.positionY,
-                side = (Item.Side) Enum.Parse(typeof(Item.Side),this.side,true),
+                side = this.side,
             };
 
             return item;
         }
+    }
+
+    public class DtoItemList
+    {
+        public List<DtoItem> shoppingList { get; set; }
+        public DtoBeacon beacon { get; set; }
     }
 }
